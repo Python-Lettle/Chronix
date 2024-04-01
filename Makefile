@@ -22,6 +22,9 @@ LDFLAGS=-m elf_i386 -Tlink.ld
 # 内核文件
 KERNEL_FILE = $(TARGET_DIR)/kernel.o $(TARGET_DIR)/main.o $(TARGET_DIR)/stdio.o
 
+# 运行选项
+QEMU_RUN_OPTION = -m 2048M
+
 all: img
 
 
@@ -40,10 +43,10 @@ clean:
 	rm $(TARGET_DIR)/* $(IMG_NAME)
 
 run:
-	$(QEMU) $(IMG_NAME)
+	$(QEMU) $(QEMU_RUN_OPTION) $(IMG_NAME)
     
 debug:
-	$(QEMU) -s -S $(IMG_NAME)
+	$(QEMU) $(QEMU_RUN_OPTION) -s -S $(IMG_NAME)
 
 # 内核文件编译规则
 $(TARGET_DIR)/main.o: $(KERNEL_DIR)/main.c

@@ -1,5 +1,11 @@
 # Chronix
 
+## 介绍
+
+![内存分布图](./doc/image/内存分布图.png)
+
+
+
 ## 快速开始
 
 ### 1. 创建目录
@@ -11,22 +17,9 @@
 ```
 .
 ├── bootloader
-│   ├── boot.asm
-│   ├── include
-│   │   ├── addresses.inc
-│   │   ├── fat16.inc
-│   │   ├── pm.inc
-│   │   ├── util16.inc
-│   │   └── util32.inc
-│   └── loader.asm
 ├── Chronix.img
 ├── include
-│   ├── common.h
-│   └── stdio.h
 ├── kernel
-│   ├── kernel.asm
-│   ├── main.c
-│   └── stdio.c
 ├── link.ld
 ├── Makefile
 └── target
