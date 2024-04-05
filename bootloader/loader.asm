@@ -16,7 +16,7 @@ DIR_WrtDate     equ 0x18	;2	最后一次写入日期
 DIR_FstClus     equ 0x1a	;2	起始簇号
 DIR_FileSize    equ 0x1c	;4	文件大小
 
-DISK_BUFFER equ 0x1e00              ; 读磁盘用的缓存区，放到kernel之前的512字节。
+DISK_BUFFER equ 0x1e00              ;读磁盘用的缓存区
 DISK_SIZE_M equ 4                   ; 磁盘容量，单位M。
 FAT1_SECTORS equ 32                 ; FAT1占用扇区数
 ROOT_DIR_SECTORS equ 32             ; 根目录占用扇区数
@@ -29,18 +29,55 @@ DIR_ENTRY_SIZE equ 32               ; 目录项为32字节。
 DIR_ENTRY_PER_SECTOR equ 16         ; 每个扇区能存放目录项的数目。
 
 %include "addresses.inc"
+%include "pm.inc"
 
 org LOADER_SEG
+;============================================================================
+;   GDT全局描述符表相关信息
+;----------------------------------------------------------------------------
+; 描述符                        基地址        段界限       段属性
+; LABEL_GDT:			Descriptor	0,          0,          0							; 空描述符，必须存在，不然CPU无法识别GDT
+; LABEL_DESC_CODE:	Descriptor	0,          0xfffff,    DA_32 | DA_CR | DA_LIMIT_4K	; 0~4G，32位可读代码段，粒度为4KB
+; LABEL_DESC_DATA:    Descriptor  0,          0xfffff,    DA_32 | DA_DRW | DA_LIMIT_4K; 0~4G，32位可读写数据段，粒度为4KB
+; LABEL_DESC_VIDEO:   Descriptor  0xb8000,    0xfffff,    DA_DRW | DA_DPL3            ; 视频段，特权级3（用户特权级）
+; ; GDT全局描述符表 -------------------------------------------------------------
+; GDTLen              equ $ - LABEL_GDT                           ; GDT的长度
+; GDTPtr              dw GDTLen - 1                               ; GDT指针.段界限
+;                     dd LOADER_PHY_ADDR + LABEL_GDT              ; GDT指针.基地址
+; ; GDT选择子 ------------------------------------------------------------------
+; Selector_code        equ LABEL_DESC_CODE - LABEL_GDT             ; 代码段选择子
+; Selector_data        equ LABEL_DESC_DATA - LABEL_GDT             ; 数据段选择子
+; Selector_video       equ LABEL_DESC_VIDEO - LABEL_GDT | SA_RPL3  ; 视频段选择子，特权级3（用户特权级）
 
-; 直接跳入32位保护模式
-cli                     ; 屏蔽中断
-lgdt [gdt_descriptor]   ; 初始化GDT
-; 把 cr0 的最低位置为 1，开启保护模式
-mov eax, cr0
-or eax, 0x1
-mov cr0, eax
 
-jmp Selector_code:PModeMain
+
+; 得到内存数
+    mov ebx, 0              ; ebx = 后续值，开始时需为0
+    mov di, _MemCheckBuffer ; es:di 指向一个地址范围描述符结构(Address Range Descriptor Structure)
+.MemChkLoop:
+	mov eax, 0E820h		; eax = 0000E820h
+	mov ecx, 20			; ecx = 地址范围描述符结构的大小
+	mov edx, 0534D4150h	; edx = 'SMAP'
+	int 15h
+	jc .MemChkFail		; 如果产生的进位，即CF = 1，跳转到.MemChkFail
+	add di, 20
+	inc dword [_ddMCRCount]	; _dwMCRNumber = ARDS　的个数
+	cmp ebx, 0
+	jne .MemChkLoop		; ebx != 0，继续进行循环
+	jmp .MemChkOK		; ebx == 0，得到内存数OK
+.MemChkFail:
+	mov dword [_ddMCRCount], 0
+.MemChkOK:
+
+    ; 直接跳入32位保护模式
+    cli                     ; 屏蔽中断
+    lgdt [GDTPtr]           ; 初始化GDT
+    ; 把 cr0 的最低位置为 1，开启保护模式
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
+
+    jmp Selector_code:PModeMain
 
 ;============================================================================
 ;   32位代码段
@@ -60,6 +97,11 @@ PModeMain:
     ; 打印字符串 'Chronix is in protected mode now!'
     push PM_STRING
     call Print
+
+    ; 计算内存大小
+    call CalMemSize
+    ; 打印内存信息
+    call PrintMemSize
 
     ;--------------------
     ; 寻找内核文件
@@ -119,6 +161,9 @@ PModeMain:
     push kernel_found_str
     call Print
 
+    ; 将MemSize当作参数
+    mov eax, [_ddMemSize]
+    mov [MEM_SIZE_PARAM], eax
     jmp dword KERNEL_PHY_ADDR ; 跳转到kernel
     jmp stop32
     
@@ -134,16 +179,38 @@ stop32:
 %include "util32.inc"
 
 [section .data32]
-ddDispPosition: dd 0xb8000 +  (80 * 2 + 0) * 2
- 
+align 32
+
+;----------------------------------------------------------------------------
+;   16位实模式下使用的数据地址
+;----------------------------------------------------------------------------
+; 字符串 ---
+_strMemSize:        db "Memory Size: ", 0
+_strKB:             db "KB", 10, 0
+_strSetupPaging:    db "Setup paging.", 10, 0
+; 变量 ---
+_ddMCRCount:        dd 0        ; 检查完成的ARDS的数量，为0则代表检查失败
+_ddMemSize:         dd 0        ; 内存大小
+_ddDispPosition:    dd (80 * 4 + 0) * 2 ; 初始化显示位置为第 4 行第 0 列
+; 地址范围描述符结构(Address Range Descriptor Structure)
+_ARDS:
+    _ddBaseAddrLow:  dd 0        ; 基地址低32位
+    _ddBaseAddrHigh: dd 0        ; 基地址高32位
+    _ddLengthLow:    dd 0        ; 内存长度（字节）低32位
+    _ddLengthHigh:   dd 0        ; 内存长度（字节）高32位
+    _ddType:         dd 0        ; ARDS的类型，用于判断是否可以被OS使用
+; 内存检查结果缓冲区，用于存放没存检查的ARDS结构，256字节是为了对齐32位，256/20=12.8
+; ，所以这个缓冲区可以存放12个ARDS。
+_MemCheckBuffer:          times 256 db 0
+
 PM_STRING: db 'Chronix is in protected mode now!', 10, 0
 kernel_notfound_str: db "Kernel Not Found", 10, 0
 kernel_found_str: db "Kernel.bin Loading...", 10, 0
 kernel_file_name_string: db 'KERNEL  BIN', 0
+
+ddDispPosition: dd 0xb8000 +  (80 * 2 + 0) * 2
+
  
-;============================================================================
-;   GDT全局描述符表相关信息
-;----------------------------------------------------------------------------
 gdt_start:
 ; 第一个描述符必须是空描述符
 gdt_null:
@@ -174,9 +241,9 @@ gdt_stack:
     db 01000000b ; Flags , Limit (bits 16-19)
     db 0x0 ; Base (bits 24-31)
 gdt_end:
- 
+
 ; GDT descriptior
-gdt_descriptor:
+GDTPtr:
 dw gdt_end - gdt_start - 1 ; Size of our GDT, always less one of the true size
 dd gdt_start ; Start address of our GDT
 
@@ -184,5 +251,3 @@ dd gdt_start ; Start address of our GDT
 Selector_code    equ gdt_code - gdt_start
 Selector_data    equ gdt_data - gdt_start
 Selector_stack   equ gdt_stack - gdt_start
-
-SELECTOR_CODE equ (0x0001<<3)+000b;

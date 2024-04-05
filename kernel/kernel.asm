@@ -13,6 +13,9 @@ global _start                       ; 导出_start程序开始符号，链接器
 [section .data]
 bits 32
     nop
+
+BOOT_PARAMS equ 0x500
+MEM_SIZE_PARAM equ BOOT_PARAMS
 ;============================================================================
 ;   内核堆栈段
 ;----------------------------------------------------------------------------
@@ -32,6 +35,11 @@ _start:     ; 内核程序入口
     mov fs, ax
     mov ss, ax              ; es = fs = ss = 内核数据段
     mov esp, StackTop       ; 栈顶
-
+    
+    push dword [MEM_SIZE_PARAM]
     ; 跳入C语言编写的主函数
-    jmp chronix_main
+    call chronix_main
+    
+stop32:
+    hlt
+    jmp stop32

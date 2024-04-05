@@ -11,8 +11,6 @@
 #ifndef CHRONIX_COMMON_H
 #define CHRONIX_COMMON_H
 
-typedef int size_t;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
+#include <type.h>
 
 #endif

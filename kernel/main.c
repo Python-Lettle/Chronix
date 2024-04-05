@@ -9,12 +9,20 @@
  */
 
 #include <stdio.h>
-
+#include <stdlib.h>
 // int display_position = (80 * 6 + 0) * 2;     // 从第 6 行第 0 列开始显示
-int row = 4;
-int col = 0;
 
-void chronix_main(void){
-    low_print("root@ChronixOS: /$", row, col);
+
+void chronix_main(int memsize){
+    memsize = memsize / 1024;       // 单位KB
+    if (memsize != 0) {
+        char memsize_str[10] = {0};
+        print_str("OS memory size(KB): ", 6, 0);
+        print_str(itoa(memsize, memsize_str, 10), 6, 20);
+    } else {
+        print_str("Can not calculate memory size.", 6, 0);
+    }
+    print_str("root@ChronixOS", 7, 0);
+    
     while (1){}
 }

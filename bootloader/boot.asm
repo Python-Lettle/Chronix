@@ -101,11 +101,6 @@ next_dir_entry:
     jmp loader_not_found            ; 没有找到loader文件。
 
 loader_found:
-    ; 打印字符串："Loader found."
-    mov si,loader_found_string
-    mov di,80 ; 在屏幕第2行显示
-    call print16
-
     ; 从目录项中获取loader文件的起始簇号
     shl bx,5 ; 乘以32
     add bx,DISK_BUFFER
@@ -135,6 +130,10 @@ read_loader:
     jb read_loader      ; jb无符号小于则跳转，jl有符号小于则跳转。
 
 read_loader_finish: ; 读取loader文件结束
+    ; 打印字符串："Loader found, jumping..."
+    mov si,loader_found_string
+    mov di,80 ; 在屏幕第2行显示
+    call print16
     jmp LOADER_SEG  ; 跳转到loader在内存中的地址
 
 loader_not_found: ; 没有找到loader文件。
@@ -149,11 +148,12 @@ stop:
 
 %include "util16.inc"
 
+DISK_BUFFER equ 0x1e00 ;读磁盘用的缓存区，放到kernel之前的512字节。
 
 loader_file_name_string:db "LOADER  BIN",0          ; 文件名 11字节
 boot_start_string:db "Chronix boot start.",0
 loader_not_found_string:db "Loader not found.",0
-loader_found_string:db "Loader found.",0
+loader_found_string:db "Loader found, jumping...",0
 
 times 510-($-$$) db 0
 db 0x55,0xaa

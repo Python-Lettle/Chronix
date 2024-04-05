@@ -16,21 +16,24 @@ PAGE_TABLE_BASE		equ	0x101000
 
 ; LOADER.BIN 被加载的位置　--- 段地址
 LOADER_SEG        equ     0x1000
-; LOADER.BIN 被加载的位置　--- 偏移地址
+; LOADER.BIN 被加载的位置　--- 偏移地址 预留出来以便存一些东西 避免边缘问题
 LOADER_OFFSET     equ     0x100
 ; LOADER.BIN 被加载到的位置　--- 物理地址　(= LOADER_SEG * 10h)
-LOADER_PHY_ADDR     equ LOADER_SEG
+LOADER_PHY_ADDR   equ LOADER_SEG * 10h
 
 ; KERNEL.BIN 被加载到的位置 ----  段地址
 KERNEL_SEG	    equ	    0x2000
 ; KERNEL.BIN 被加载到的位置 ---- 偏移地址
 KERNEL_OFFSET	equ	    0
 ; KERNEL.BIN 被加载到的位置　--- 物理地址　(= KERNEL_SEG * 10h)
-KERNEL_PHY_ADDR	equ	KERNEL_SEG
+KERNEL_PHY_ADDR	equ	KERNEL_SEG * 10h
 
 ;; 为kernel.bin装载保留的内存大小(字节)，内核文件大小不应该超过这个大小！
-KERNEL_HAVE_SPACE   equ LOADER_PHY_ADDR - KERNEL_PHY_ADDR
-
-DISK_BUFFER equ 0x1e00 ;读磁盘用的缓存区，放到kernel之前的512字节。
+KERNEL_HAVE_SPACE   equ  KERNEL_PHY_ADDR - LOADER_PHY_ADDR
 
 VIDEO_SEGMENT_ADDRESS equ 0xb800
+
+; 储存启动时传递给内核的参数
+; 500H ~ 600H: 内存大小 (256B)
+BOOT_PARAMS equ 0x500
+MEM_SIZE_PARAM equ BOOT_PARAMS

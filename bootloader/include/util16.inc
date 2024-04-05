@@ -4,7 +4,7 @@
 clear_screen:
     mov ah,0x00     ; 黑底黑字
     mov al,' '      ; 空格
-    mov cx,VIDEO_CHAR_MAX_COUNT ; 循环控制
+    mov cx,2000     ; 循环控制 屏幕最多2000个字符
     .start_blank:
     mov bx,cx       ; 以下3行表示bx=(cx-1)*2 
     dec bx
@@ -89,3 +89,4 @@ read_one_sector16:
     add di,2
     loop .go_on_read
     ret
+
