@@ -7,6 +7,7 @@ BOCHS = bochs
 # 目录结构
 BOOT_DIR = bootloader
 KERNEL_DIR = kernel
+KERNEL_COMPONENT = $(KERNEL_DIR)/components
 TARGET_DIR = target
 TARGET_KERNEL_DIR = $(TARGET_DIR)/kernel
 
@@ -23,7 +24,8 @@ LDFLAGS=-m elf_i386 -Tlink.ld
 
 # 内核文件
 KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/main.o \
-			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o
+			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o \
+			$(TARGET_KERNEL_DIR)/Terminal.o
 
 # 运行选项
 QEMU_RUN_OPTION = -m 64M
@@ -72,3 +74,8 @@ $(TARGET_KERNEL_DIR)/stdlib.o: $(KERNEL_DIR)/stdlib.c
 $(TARGET_KERNEL_DIR)/type.o: $(KERNEL_DIR)/type.c
 	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/type.c
 
+$(TARGET_KERNEL_DIR)/string.o: $(KERNEL_DIR)/string.c
+	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/string.c
+
+$(TARGET_KERNEL_DIR)/Terminal.o: $(KERNEL_COMPONENT)/Terminal.c
+	$(CC) $(CFLAGS) -o $@ $(KERNEL_COMPONENT)/Terminal.c

@@ -140,7 +140,7 @@ PModeMain:
     call read_one_sector32
 
     ; 按簇读kernel
-    mov ebp,KERNEL_PHY_ADDR ; 目标地址初值
+    mov ebp,KERNEL_SEG ; 目标地址初值
     read_kernel:
     xor esi,esi
     mov si,bx
@@ -156,7 +156,6 @@ PModeMain:
     jb read_kernel          ; jb无符号小于则跳转，jl有符号小于则跳转。
 
     goto_kernel:
-    ; mov esp,KERNEL_PHY_ADDR 更改栈后开机桌面显示很慢，关闭窗口的速度也很慢。
     ; 打印字符串 "Kernel.bin Loading..."
     push kernel_found_str
     call Print
@@ -164,7 +163,7 @@ PModeMain:
     ; 将MemSize当作参数
     mov eax, [_ddMemSize]
     mov [MEM_SIZE_PARAM], eax
-    jmp dword KERNEL_PHY_ADDR ; 跳转到kernel
+    jmp dword KERNEL_SEG ; 跳转到kernel
     jmp stop32
     
 
