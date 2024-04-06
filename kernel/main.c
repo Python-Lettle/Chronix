@@ -13,15 +13,25 @@
 #include <stdlib.h>
 
 #include "components/Terminal.h"
-// int display_position = (80 * 6 + 0) * 2;     // 从第 6 行第 0 列开始显示
 
-void chronix_main(int memsize){     // 2001c
+/**
+ * @brief Place parameters in 0x500 in the struct, used to obtain startup parameters.
+ */
+struct BOOT_PARAM
+{
+    int memsize;
+};
+
+void chronix_main(void)      // 2001c
+{
+    // Boot params
+    struct BOOT_PARAM *boot_param = (struct BOOT_PARAM *)0x500;
 
     Terminal terminal;
     Terminal_init(&terminal, 6, 0);
 
     // Print memory size
-    memsize = memsize / 1024;       // KB
+    int memsize = boot_param->memsize / 1024;       // KB
     if (memsize != 0) {
         char memsize_str[10] = {0};
         terminal.print(&terminal, "OS memory size(KB): ");
@@ -30,7 +40,7 @@ void chronix_main(int memsize){     // 2001c
     } else {
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
-    terminal.print(&terminal, "root@ChronixOS");
+    terminal.print(&terminal, "root@Chronix$");
     
     while (1){}
 }

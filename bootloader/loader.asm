@@ -32,25 +32,6 @@ DIR_ENTRY_PER_SECTOR equ 16         ; 每个扇区能存放目录项的数目。
 %include "pm.inc"
 
 org LOADER_SEG
-;============================================================================
-;   GDT全局描述符表相关信息
-;----------------------------------------------------------------------------
-; 描述符                        基地址        段界限       段属性
-; LABEL_GDT:			Descriptor	0,          0,          0							; 空描述符，必须存在，不然CPU无法识别GDT
-; LABEL_DESC_CODE:	Descriptor	0,          0xfffff,    DA_32 | DA_CR | DA_LIMIT_4K	; 0~4G，32位可读代码段，粒度为4KB
-; LABEL_DESC_DATA:    Descriptor  0,          0xfffff,    DA_32 | DA_DRW | DA_LIMIT_4K; 0~4G，32位可读写数据段，粒度为4KB
-; LABEL_DESC_VIDEO:   Descriptor  0xb8000,    0xfffff,    DA_DRW | DA_DPL3            ; 视频段，特权级3（用户特权级）
-; ; GDT全局描述符表 -------------------------------------------------------------
-; GDTLen              equ $ - LABEL_GDT                           ; GDT的长度
-; GDTPtr              dw GDTLen - 1                               ; GDT指针.段界限
-;                     dd LOADER_PHY_ADDR + LABEL_GDT              ; GDT指针.基地址
-; ; GDT选择子 ------------------------------------------------------------------
-; Selector_code        equ LABEL_DESC_CODE - LABEL_GDT             ; 代码段选择子
-; Selector_data        equ LABEL_DESC_DATA - LABEL_GDT             ; 数据段选择子
-; Selector_video       equ LABEL_DESC_VIDEO - LABEL_GDT | SA_RPL3  ; 视频段选择子，特权级3（用户特权级）
-
-
-
 ; 得到内存数
     mov ebx, 0              ; ebx = 后续值，开始时需为0
     mov di, _MemCheckBuffer ; es:di 指向一个地址范围描述符结构(Address Range Descriptor Structure)
@@ -160,7 +141,7 @@ PModeMain:
     push kernel_found_str
     call Print
 
-    ; 将MemSize当作参数
+    ; 将MemSize当作参数 保存至 0x500
     mov eax, [_ddMemSize]
     mov [MEM_SIZE_PARAM], eax
     jmp dword KERNEL_SEG ; 跳转到kernel
@@ -209,7 +190,9 @@ kernel_file_name_string: db 'KERNEL  BIN', 0
 
 ddDispPosition: dd 0xb8000 +  (80 * 2 + 0) * 2
 
- 
+;============================================================================
+;   GDT全局描述符表相关信息
+;----------------------------------------------------------------------------
 gdt_start:
 ; 第一个描述符必须是空描述符
 gdt_null:
