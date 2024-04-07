@@ -23,7 +23,7 @@ CFLAGS=-m32 -c -fno-builtin -g -std=c99 -Wall -Wextra -I $(INCLUDE_DIR)
 LDFLAGS=-m elf_i386 -Tlink.ld
 
 # 内核文件
-KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/main.o \
+KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o \
 			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o \
 			$(TARGET_KERNEL_DIR)/Terminal.o
 
@@ -61,6 +61,9 @@ debug:
 $(TARGET_KERNEL_DIR)/kernel.o: $(KERNEL_DIR)/kernel.asm
 	mkdir -p $(TARGET_KERNEL_DIR)
 	$(AS) -f elf $(KERNEL_DIR)/kernel.asm -o $(TARGET_KERNEL_DIR)/kernel.o -I bootloader/include
+
+$(TARGET_KERNEL_DIR)/kernel_lib32.o: $(KERNEL_DIR)/kernel_lib32.asm
+	$(AS) -f elf $(KERNEL_DIR)/kernel_lib32.asm -o $(TARGET_KERNEL_DIR)/kernel_lib32.o -I bootloader/include
 
 $(TARGET_KERNEL_DIR)/main.o: $(KERNEL_DIR)/main.c
 	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/main.c

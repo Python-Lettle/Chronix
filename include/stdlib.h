@@ -20,10 +20,17 @@
 int atoi(const char *str);
 
 /**
+ * @brief 将int型数字转换成字符串
+ * 
  * @param value：要转换的数据
  * @param string：目标字符串的地址
  * @param radix：转换后的进制数，可以是10进制、16进制等，范围必须在 2-36
  */
 char * itoa(int num, char str[], int base);
+
+/**
+ * @brief 秒 转化为 毫秒
+ */
+#define sec2ms(s) (s * 1000)
 
 #endif

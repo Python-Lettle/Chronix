@@ -7,11 +7,14 @@
  * gitee: https://gitee.com/lettle/
  * github: https://github.com/python-lettle/
  * bilibili: https://space.bilibili.com/420393625
+ * 
+ * 这里是公共的type定义
  */
 
-#ifndef CHRONIX_TYPE_H
-#define CHRONIX_TYPE_H
+#ifndef TYPE_H
+#define TYPE_H
 
+// 常用数据类型定义
 typedef int size_t;
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;

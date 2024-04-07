@@ -9,23 +9,18 @@
  * bilibili: https://space.bilibili.com/420393625
  */
 
+#include <kernel/config.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "components/Terminal.h"
+#include "global.h"
 
-/**
- * @brief Place parameters in 0x500 in the struct, used to obtain startup parameters.
- */
-struct BOOT_PARAM
-{
-    int memsize;
-};
 
 void chronix_main(void)      // 2001c
 {
     // Boot params
-    struct BOOT_PARAM *boot_param = (struct BOOT_PARAM *)0x500;
+    struct BOOT_PARAM *boot_param = (struct BOOT_PARAM *)BOOT_PARAM_ADDR;
 
     Terminal terminal;
     Terminal_init(&terminal, 6, 0);
