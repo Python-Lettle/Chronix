@@ -11,6 +11,23 @@
 
 #include <string.h>
 
+int memcmp(const void *s1, const void *s2, int n)
+{
+    /* 健壮性 */
+    if ((s1 == 0) || (s2 == 0)) {
+        return (s1 - s2);
+    }
+
+    register const char *p1 = s1;
+    register const char *p2 = s2;
+    int i;
+    for (i = 0; i < n; i++,p1++,p2++) {
+        if (*p1 != *p2) {
+            return (*p1 - *p2);
+        }
+    }
+    return 0;
+}
 
 int strlen(const char *str)
 {
@@ -22,13 +39,40 @@ int strlen(const char *str)
 }
 
 
-int strcmp(const char* str1, const char* str2)
+int strcmp(register const char *s1, register const char *s2)
 {
-    // Determine if the string has ended or if a different character has been found
-    while ((*str1 != '\0') && (*str1 == *str2)) 
-    {
-        str1++;
-        str2++;
+    while (*s1 == *s2++) {
+        if (*s1++ == '\0') {
+            return 0;
+        }
     }
-    return *str1 - *str2;   // Compare the corresponding character
+    if (*s1 == '\0') return -1;
+    if (*--s2 == '\0') return 1;
+    return (unsigned char) *s1 - (unsigned char) *s2;
+}
+
+
+/*===========================================================================*
+ *				strncmp					     *
+ *			  比较size个字符
+ *===========================================================================*/
+int strncmp(register const char *s1,register const char *s2,register int n)
+{
+    if (n) {
+        do {
+            if (*s1 != *s2++){
+                break;
+            }
+            if (*s1++ == '\0'){
+                return 0;
+            }
+        } while (--n > 0);
+
+        if (n > 0) {
+            if (*s1 == '\0') return -1;
+            if (*--s2 == '\0') return 1;
+            return (unsigned char) *s1 - (unsigned char) *s2;
+        }
+    }
+    return 0;
 }

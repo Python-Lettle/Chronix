@@ -13,9 +13,11 @@
 #define CHRONIX_KERNEL_GLOBAL_H
 
 #include <kernel/type.h>
+#include "components/Terminal.h"
 
 /* 内核内存 */
 extern MemoryMap kernel_map;            /* 内核内存映像 */
 extern struct BOOT_PARAM *boot_param;   /* 启动参数 */
+extern Terminal terminal;
 
 #endif

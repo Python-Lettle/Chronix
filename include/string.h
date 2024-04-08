@@ -12,6 +12,21 @@
 #ifndef CHROMIUM_STRING_H
 #define CHROMIUM_STRING_H
 
+
+/**
+ * @brief 比较两个内存区域
+ */
+int memcmp(const void *s1, const void *s2, int n);
+
+/**
+ * @brief 内存复制
+ * 
+ * @param p_dst  目的地址
+ * @param p_src  源地址
+ * @param size   复制大小
+ */
+void* memcpy(void* p_dst, void* p_src, int size);
+
 /**
  * @return length of string
  */
@@ -24,6 +39,16 @@ int strlen(const char *str);
  * @param str2 
  * @return int Same returns 0, else returns >0 or <0 number
  */
-int strcmp(const char* stri1, const char* str2);
+int strcmp(register const char *s1, register const char *s2);
+
+/**
+ * @brief 比较n个字符
+ */
+int strncmp(register const char *s1,register const char *s2,register int n);
+
+/**
+ * @brief 在汇编实现的字符串拷贝
+ */
+char* strcpy(char* p_dst, char* p_src);
 
 #endif

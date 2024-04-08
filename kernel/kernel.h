@@ -10,6 +10,8 @@
  * 
  * 这里将大部分库一起导入
  */
+#ifndef CHRONIX_KERNEL_H
+#define CHRONIX_KERNEL_H
 
 #include <kernel/config.h>
 #include <kernel/const.h>
@@ -17,4 +19,12 @@
 
 #include <string.h>
 
+//============================================================
+// init.c
+//============================================================
+/**
+ * @brief 内核初始化
+ */
+void kernel_init(void);
 
+#endif

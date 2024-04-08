@@ -14,4 +14,11 @@
 
 #define BOOT_PARAM_ADDR 0x500       // boot参数地址
 
+/* 控制器任务的数量（/dev/cN设备类）。 */
+#define NR_CONTROLLERS          1
+/* 系统任务数量 */
+#define NR_TASKS    (0 + NR_CONTROLLERS)
+/* 进程表中的用户进程的槽数，这个配置决定了Chronix能同时运行多少个用户进程。 */
+#define NR_PROCS          32
+
 #endif

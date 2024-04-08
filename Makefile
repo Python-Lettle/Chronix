@@ -23,8 +23,8 @@ CFLAGS=-m32 -c -fno-builtin -g -std=c99 -Wall -Wextra -I $(INCLUDE_DIR)
 LDFLAGS=-m elf_i386 -Tlink.ld
 
 # 内核文件
-KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o \
-			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o \
+KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o $(TARGET_KERNEL_DIR)/init.o \
+			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o $(TARGET_KERNEL_DIR)/string_asm.o \
 			$(TARGET_KERNEL_DIR)/Terminal.o
 
 # 运行选项
@@ -68,6 +68,9 @@ $(TARGET_KERNEL_DIR)/kernel_lib32.o: $(KERNEL_DIR)/kernel_lib32.asm
 $(TARGET_KERNEL_DIR)/main.o: $(KERNEL_DIR)/main.c
 	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/main.c
 
+$(TARGET_KERNEL_DIR)/init.o: $(KERNEL_DIR)/init.c
+	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/init.c
+
 $(TARGET_KERNEL_DIR)/stdio.o: $(KERNEL_DIR)/stdio.c
 	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/stdio.c
 
@@ -79,6 +82,9 @@ $(TARGET_KERNEL_DIR)/type.o: $(KERNEL_DIR)/type.c
 
 $(TARGET_KERNEL_DIR)/string.o: $(KERNEL_DIR)/string.c
 	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/string.c
+
+$(TARGET_KERNEL_DIR)/string_asm.o: $(KERNEL_DIR)/string.asm
+	$(AS) -f elf $(KERNEL_DIR)/string.asm -o $(TARGET_KERNEL_DIR)/string_asm.o
 
 $(TARGET_KERNEL_DIR)/Terminal.o: $(KERNEL_COMPONENT)/Terminal.c
 	$(CC) $(CFLAGS) -o $@ $(KERNEL_COMPONENT)/Terminal.c

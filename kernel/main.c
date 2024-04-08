@@ -15,15 +15,12 @@
 
 #include "components/Terminal.h"
 #include "global.h"
+#include "kernel.h"
 
 
 void chronix_main(void)      // 2001c
 {
-    // Boot params
-    struct BOOT_PARAM *boot_param = (struct BOOT_PARAM *)BOOT_PARAM_ADDR;
-
-    Terminal terminal;
-    Terminal_init(&terminal, 6, 0);
+    kernel_init();
 
     // Print memory size
     int memsize = boot_param->memsize / 1024;       // KB
