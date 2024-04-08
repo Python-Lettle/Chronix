@@ -9,18 +9,11 @@
  * bilibili: https://space.bilibili.com/420393625
  */
 
-#include <kernel/config.h>
-#include <stdio.h>
 #include <stdlib.h>
-
-#include "components/Terminal.h"
 #include "global.h"
-#include "kernel.h"
-
 
 void chronix_main(void)      // 2001c
 {
-    kernel_init();
 
     // Print memory size
     int memsize = boot_param->memsize / 1024;       // KB

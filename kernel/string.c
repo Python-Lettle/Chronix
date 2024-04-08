@@ -51,11 +51,6 @@ int strcmp(register const char *s1, register const char *s2)
     return (unsigned char) *s1 - (unsigned char) *s2;
 }
 
-
-/*===========================================================================*
- *				strncmp					     *
- *			  比较size个字符
- *===========================================================================*/
 int strncmp(register const char *s1,register const char *s2,register int n)
 {
     if (n) {

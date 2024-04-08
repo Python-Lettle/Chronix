@@ -25,7 +25,7 @@ LDFLAGS=-m elf_i386 -Tlink.ld
 # 内核文件
 KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o $(TARGET_KERNEL_DIR)/init.o \
 			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o $(TARGET_KERNEL_DIR)/string_asm.o \
-			$(TARGET_KERNEL_DIR)/Terminal.o
+			$(TARGET_KERNEL_DIR)/Terminal.o $(TARGET_KERNEL_DIR)/protect.o
 
 # 运行选项
 QEMU_RUN_OPTION = -m 64M
@@ -66,25 +66,28 @@ $(TARGET_KERNEL_DIR)/kernel_lib32.o: $(KERNEL_DIR)/kernel_lib32.asm
 	$(AS) -f elf $(KERNEL_DIR)/kernel_lib32.asm -o $(TARGET_KERNEL_DIR)/kernel_lib32.o -I bootloader/include
 
 $(TARGET_KERNEL_DIR)/main.o: $(KERNEL_DIR)/main.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/main.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/init.o: $(KERNEL_DIR)/init.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/init.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/stdio.o: $(KERNEL_DIR)/stdio.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/stdio.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/stdlib.o: $(KERNEL_DIR)/stdlib.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/stdlib.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/type.o: $(KERNEL_DIR)/type.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/type.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/string.o: $(KERNEL_DIR)/string.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_DIR)/string.c
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/string_asm.o: $(KERNEL_DIR)/string.asm
 	$(AS) -f elf $(KERNEL_DIR)/string.asm -o $(TARGET_KERNEL_DIR)/string_asm.o
 
 $(TARGET_KERNEL_DIR)/Terminal.o: $(KERNEL_COMPONENT)/Terminal.c
-	$(CC) $(CFLAGS) -o $@ $(KERNEL_COMPONENT)/Terminal.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(TARGET_KERNEL_DIR)/protect.o: $(KERNEL_DIR)/protect.c
+	$(CC) $(CFLAGS) -o $@ $^

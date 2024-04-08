@@ -2,7 +2,11 @@
 ;   导入和导出
 ;----------------------------------------------------------------------------
 ; 导入函数
-extern chronix_main                 ; 内核主函数
+extern chronix_main                 ; 内核主函数 --- main.c
+extern kernel_init                  ; 初始化函数 --- init.c
+
+; 导入变量
+extern gdt_ptr                      ; protect.c / global.h
 
 ; 导出函数
 global _start                       ; 导出_start程序开始符号，链接器需要它
@@ -26,6 +30,11 @@ _start:     ; 内核程序入口
     mov fs, ax
     mov ss, ax              ; es = fs = ss = 内核数据段
     mov esp, StackTop       ; 栈顶
+
+    sgdt [gdt_ptr]
+    ; 进入主函数之前先进行初始化
+    call kernel_init
+    lgdt [gdt_ptr]
     ; 跳入C语言编写的主函数
     call chronix_main
     

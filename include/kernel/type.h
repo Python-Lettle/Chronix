@@ -18,6 +18,8 @@
 
 // 内存相关
 
+typedef unsigned int vir_bytes;
+
 /* 虚拟内存块，一个块在INTEL的Chronix中是256个字节 */
 typedef unsigned int vir_clicks;
 /* 物理地址（字节） */

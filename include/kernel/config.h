@@ -14,6 +14,12 @@
 
 #define BOOT_PARAM_ADDR 0x500       // boot参数地址
 
+/* 内核代码段、数据段基地址
+ * 注意：要和GDT中设置的值保持一致！
+ */
+#define KERNEL_TEXT_SEG_BASE    0
+#define KERNEL_DATA_SEG_BASE    0
+
 /* 控制器任务的数量（/dev/cN设备类）。 */
 #define NR_CONTROLLERS          1
 /* 系统任务数量 */
