@@ -83,6 +83,8 @@ PModeMain:
     call CalMemSize
     ; 打印内存信息
     call PrintMemSize
+    ; 开启分页模式
+    call SetupPaging
 
     ;--------------------
     ; 寻找内核文件
@@ -187,6 +189,7 @@ PM_STRING: db 'Chronix is in protected mode now!', 10, 0
 kernel_notfound_str: db "Kernel Not Found", 10, 0
 kernel_found_str: db "Kernel.bin Loading...", 10, 0
 kernel_file_name_string: db 'KERNEL  BIN', 0
+paging_start_str: db "Paging Start!", 10, 0
 
 ddDispPosition: dd 0xb8000 +  (80 * 2 + 0) * 2
 

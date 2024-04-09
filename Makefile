@@ -30,6 +30,8 @@ KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o 
 # 运行选项
 QEMU_RUN_OPTION = -m 64M
 
+MOUNT_POINT = /mnt/Chronix
+
 all: img
 
 
@@ -42,9 +44,13 @@ kernel: $(KERNEL_FILE)
 	$(LD) $(LDFLAGS) -o $(TARGET_DIR)/kernel.elf $^
 	objcopy -O binary $(TARGET_DIR)/kernel.elf $(TARGET_DIR)/kernel.bin
 
-img: boot
+img: boot kernel
 	dd if=/dev/zero of=$(IMG_NAME) bs=512 count=2880
 	dd if=$(TARGET_DIR)/boot.bin of=$(IMG_NAME) conv=notrunc bs=512 count=1
+	sudo mount $(IMG_NAME) $(MOUNT_POINT)
+	sudo cp -fv $(TARGET_DIR)/loader.bin $(MOUNT_POINT)
+	sudo cp -fv $(TARGET_DIR)/kernel.bin $(MOUNT_POINT)
+	sudo umount $(MOUNT_POINT)
 
 clean:
 	rm -rf $(TARGET_DIR)/*

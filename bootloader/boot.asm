@@ -73,16 +73,18 @@ boot_start:
     ; 清屏
     call clear_screen
 
-    ; 打印字符串："Chronix boot start."
-    mov si,boot_start_string
-    mov di,0 ;在屏幕第1行显示
-    call print16
+    
 
     ; 读取loader文件开始
     ; 读取根目录的第1个扇区（1个扇区可以存放16个目录项，我们用到的文件少，不会超过16个。）
     mov esi,SECTOR_NUM_OF_ROOT_DIR_START 
     mov di,DISK_BUFFER
     call read_one_sector16
+
+    ; 打印字符串："Chronix boot start."
+    mov si,boot_start_string
+    mov di,0 ;在屏幕第1行显示
+    call print16
 
     ; 在16个目录项中通过文件名查找文件
     cld                             ; cld将标志位DF置0，在串处理指令中控制每次操作后让si和di自动递增。std相反。下面repe cmpsb会用到。
