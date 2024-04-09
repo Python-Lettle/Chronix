@@ -1,0 +1,34 @@
+# 指定虚拟机的内存大小为32M
+# 看到sample配置文件中，讲到“MEGS”选项已弃用。请改用“MEMORY”选项。自行决定。
+megs: 256
+
+# 指定虚拟机的BIOS镜像
+romimage:file=/usr/local/share/bochs/BIOS-bochs-latest
+vgaromimage:file=/usr/local/share/bochs/VGABIOS-lgpl-latest
+
+# 软盘启动及配置（1_44为大小，支持的大小有：
+#   2_88 ： 2.88MB 3.5 介质
+#   1_44 ： 1.44MB 3.5 介质
+#   1_2 ： 1.2MB  5.25 介质
+#   720k ： 720KB  3.5 介质
+#   360k ： 360KB  5.25 介质
+#   320k ： 320KB  5.25 介质
+#   180k ： 180KB  5.25 介质
+#   160k ： 160KB  5.25 介质
+# ）
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14  
+ata0-master: type=disk, path="Chronix.img", mode=flat
+# floppya: 1_44=Chronix.img,status=inserted
+boot: disk
+
+# 指定日志文件，里面有各种运行时信息（可以不指定）
+log: bochsout.txt
+
+# 不使用鼠标（使用则设为1，尽量不使用）
+mouse: enabled=0
+
+# 键盘映射，我们选用美式键盘为默认
+keyboard: keymap=/usr/share/bochs/keymaps/x11-pc-us.map
+
+# enable GUI debugger
+display_library: x
