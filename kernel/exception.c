@@ -50,10 +50,8 @@ void exception_handler(int int_vector, int err_num)
     // 内核发生异常，宕机
     if(exception_table[int_vector] == 0){
         terminal.print(&terminal,"*****A exception, but it not in table!*****\n");
-        _io_hlt();
     } else {
         terminal.print(&terminal,exception_table[int_vector]);
-        _io_hlt();
     }
 
     // 输出错误码
@@ -62,5 +60,11 @@ void exception_handler(int int_vector, int err_num)
         itoa(err_num, err_num_str, 10);
         terminal.print(&terminal,err_num_str);
     }
+
+    while (1)
+    {
+        _io_hlt();
+    }
+    
 
 }

@@ -14,6 +14,7 @@
 #include <string.h>
 #include "global.h"
 #include "exception.h"
+#include "components/Terminal.h"
 
 /* 全局描述符表GDT */
 SegDescriptor gdt[GDT_SIZE];
@@ -61,6 +62,10 @@ void protect_init(void)
     uint32_t* p_gdt_base = (uint32_t*)vir2phys(&gdt_ptr[2]);
     *p_gdt_limit = GDT_SIZE * DESCRIPTOR_SIZE - 1;
     *p_gdt_base = vir2phys(&gdt);
+    init_segment_desc(gdt+1, 0, 0xffffffff, AR_CODE32_ER_K);
+    init_segment_desc(gdt+2, 0, 0xffffffff, AR_DATA32_RW_K);
+    init_segment_desc(gdt+3, 0, 0xffffffff, AR_CODE32_ER_U);
+    init_segment_desc(gdt+4, 0, 0xffffffff, AR_DATA32_RW_U);
 
     /* 算出IDT的基地址和界限，设置新的 idt_ptr */
     uint16_t* p_idt_limit = (uint16_t*)vir2phys(&idt_ptr[0]);
@@ -93,7 +98,7 @@ void init_segment_desc(SegDescriptor *p_desc,phys_bytes base,phys_bytes limit,ui
     /* 初始化一个数据段描述符 */
     p_desc->limit_low	= limit & 0x0FFFF;          /* 段界限 1		(2 字节) */
     p_desc->base_low	= base & 0x0FFFF;           /* 段基址 1		(2 字节) */
-    p_desc->base_middle	= (base >> 16) & 0x0FF;     /* 段基址 2		(1 字节) */
+    p_desc->base_middle	= (base >> 16) & 0xFF;      /* 段基址 2		(1 字节) */
     p_desc->access		= attribute & 0xFF;         /* 属性 1 */
     p_desc->granularity = ((limit >> 16) & 0x0F) |  /* 段界限 2 + 属性 2 */
                           ((attribute >> 8) & 0xF0);
@@ -115,7 +120,7 @@ void init_gate(uint8_t vector,uint8_t desc_type,int_handler_t handler,uint8_t pr
     p_gate->selector = SELECTOR_KERNEL_CS;
     p_gate->dcount = 0;
     p_gate->attr = desc_type | (privilege << 5);
-    p_gate->offset_high = (base_addr >> 16) & 0xFFFF;
+    // p_gate->offset_high = (base_addr >> 16) & 0xFFFF;
 }
 
 /*=========================================================================*

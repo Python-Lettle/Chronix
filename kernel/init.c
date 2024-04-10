@@ -20,12 +20,13 @@ Terminal terminal;
 
 void kernel_init(void)
 {
+    protect_init();
+
     // Boot params 获取
     boot_param = (struct BOOT_PARAM *)BOOT_PARAM_ADDR;
     // 初始化 Terminal
     Terminal_init(&terminal, 7, 0);
 
     // data_base = seg2phys();
-    protect_init();
 
 }

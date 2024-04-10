@@ -29,6 +29,8 @@ struct Terminal
      * @param str 需要输出的字符串
      */
     void (*print)(Terminal *self, const char *str);
+
+    void (*new_line)(Terminal *self);
 };
 
 /**

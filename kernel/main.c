@@ -16,8 +16,8 @@ void chronix_main(void)      // 2001c
 {
 
     // Print memory size
-    int memsize = boot_param->memsize / 1024;       // KB
-    if (memsize != 0) {
+    if (boot_param->memsize != 0) {
+        int memsize = boot_param->memsize / 1024;       // KB
         char memsize_str[10] = {0};
         terminal.print(&terminal, "OS memory size(KB): ");
         terminal.print(&terminal, itoa(memsize, memsize_str, 10));
@@ -25,7 +25,10 @@ void chronix_main(void)      // 2001c
     } else {
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
-    terminal.print(&terminal, "root@Chronix$");
+    terminal.print(&terminal, "root@Chronix$\n");
     
+    int a=0;
+    int b=11/a;
+
     while (1){ _io_hlt();}
 }

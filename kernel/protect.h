@@ -14,6 +14,7 @@
 
 #include <kernel/type.h>
 #include <kernel/config.h>
+#include <kernel/const.h>
 
 void protect_init(void);
 
@@ -24,6 +25,11 @@ typedef struct descriptor_s {
     char limit[sizeof(uint16_t)];
     char base[sizeof(uint32_t)];		/* really u24_t + pad for 286 */
 } Descriptor;
+
+#define AR_CODE32_ER_K 0x4098 //Execute-Only
+#define AR_DATA32_RW_K 0x4092 //Read/Write
+#define AR_CODE32_ER_U 0x40f8 //Execute-Only
+#define AR_DATA32_RW_U 0x40f2 //Read/Write
 
 /*================================================================================================*/
 /* 门描述符 */

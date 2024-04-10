@@ -14,10 +14,12 @@
 
 #include <kernel/type.h>
 #include "components/Terminal.h"
+#include "protect.h"
 
 extern MemoryMap kernel_map;            /* 内核内存映像 */
 extern struct BOOT_PARAM *boot_param;   /* 启动参数 */
 extern Terminal terminal;
+extern Gate idt[IDT_SIZE];
 
 uint8_t gdt_ptr[6];                     /* kernel.asm */
 uint8_t idt_ptr[6];                     /* IDT指针，同上 */

@@ -19,8 +19,7 @@ void Terminal_print(Terminal *self, const char *str)
     // 分析 str 中的换行符
     while(*str != '\0') {
         if(*str == '\n') {
-            self->row++;
-            self->col = 0;
+            self->new_line(self);
         } else {
             putchar(*str, self->row, self->col++);
         }
@@ -30,9 +29,17 @@ void Terminal_print(Terminal *self, const char *str)
     // print_str(str, self->row, self->col);
 }
 
+void Terminal_new_line(Terminal *self)
+{
+    self->row++;
+    self->row = self->row % 25;
+    self->col = 0;
+}
+
 void Terminal_init(Terminal *terminal, int row, int col)
 {
     terminal->row = row;
     terminal->col = col;
     terminal->print = Terminal_print;
+    terminal->new_line = Terminal_new_line;
 }
