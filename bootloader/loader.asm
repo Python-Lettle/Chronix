@@ -84,7 +84,7 @@ PModeMain:
     ; 打印内存信息
     call PrintMemSize
     ; 开启分页模式
-    call SetupPaging
+    ; call SetupPaging
 
     ;--------------------
     ; 寻找内核文件

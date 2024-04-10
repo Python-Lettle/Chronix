@@ -11,6 +11,7 @@
 #include "kernel.h"
 #include "global.h"
 #include "components/Terminal.h"
+#include "protect.h"
 
 // 定义全局变量
 struct BOOT_PARAM *boot_param;
@@ -25,5 +26,6 @@ void kernel_init(void)
     Terminal_init(&terminal, 7, 0);
 
     // data_base = seg2phys();
+    protect_init();
 
 }

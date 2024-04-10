@@ -66,20 +66,20 @@ _start:     ; 内核程序入口
     lgdt [gdt_ptr]
 	lidt [idt_ptr]
 	; 一个跳转指令，让以上设置及时生效
-    jmp csinit
+;     jmp csinit
 
-csinit:
-	; 加载任务状态段 TSS
-    xor eax, eax
-    mov ax, SELECTOR_TSS
-    ltr ax
+; csinit:
+; 	; 加载任务状态段 TSS
+;     xor eax, eax
+;     mov ax, SELECTOR_TSS
+;     ltr ax
 
     ; 跳入C语言编写的主函数
     jmp chronix_main
     
 _io_hlt:
     hlt
-    jmp _io_hlt
+	ret
 
 ;============================================================================
 ;   异常处理
