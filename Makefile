@@ -25,7 +25,7 @@ LDFLAGS=-m elf_i386 -Tlink.ld
 # 内核文件
 KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o $(TARGET_KERNEL_DIR)/init.o \
 			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o $(TARGET_KERNEL_DIR)/string_asm.o \
-			$(TARGET_KERNEL_DIR)/Terminal.o $(TARGET_KERNEL_DIR)/protect.o
+			$(TARGET_KERNEL_DIR)/Terminal.o $(TARGET_KERNEL_DIR)/protect.o $(TARGET_KERNEL_DIR)/exception.o
 
 # 运行选项
 QEMU_RUN_OPTION = -m 64M
@@ -96,4 +96,7 @@ $(TARGET_KERNEL_DIR)/Terminal.o: $(KERNEL_COMPONENT)/Terminal.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/protect.o: $(KERNEL_DIR)/protect.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(TARGET_KERNEL_DIR)/exception.o: $(KERNEL_DIR)/exception.c
 	$(CC) $(CFLAGS) -o $@ $^

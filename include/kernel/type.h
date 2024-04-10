@@ -16,6 +16,11 @@
 
 #include <type.h>
 
+/* 端口数据类型，用于访问I/O端口 */
+typedef unsigned port_t;
+/* 寄存器数据类型，用于访问存储器段和CPU寄存器 */
+typedef unsigned reg_t;
+
 // 内存相关
 
 typedef unsigned int vir_bytes;
@@ -60,5 +65,8 @@ struct BOOT_PARAM
 {
     int memsize;
 };
+
+/* 硬件（异常）中断处理函数原型 */
+typedef void (*int_handler_t)(void);
 
 #endif

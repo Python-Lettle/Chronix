@@ -19,6 +19,9 @@ extern MemoryMap kernel_map;            /* 内核内存映像 */
 extern struct BOOT_PARAM *boot_param;   /* 启动参数 */
 extern Terminal terminal;
 
-uint8_t gdt_ptr[6];              /* kernel.asm */
+uint8_t gdt_ptr[6];                     /* kernel.asm */
+uint8_t idt_ptr[6];                     /* IDT指针，同上 */
+
+void _io_hlt(void);                     /* kernel.asm 中的htl*/
 
 #endif

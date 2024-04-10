@@ -28,6 +28,11 @@ int memcmp(const void *s1, const void *s2, int n);
 void* memcpy(void* p_dst, void* p_src, int size);
 
 /**
+ * @brief 设置内存内容
+*/
+void* memset(void *_s, int _c, int _n);
+
+/**
  * @return length of string
  */
 int strlen(const char *str);

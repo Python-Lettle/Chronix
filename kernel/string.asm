@@ -2,6 +2,7 @@
 ; 导出函数
 global strcpy
 global memcpy
+global memset
 
 ;================================================================================================
 ; char* strcpy(char* p_dst, char* p_src);
@@ -55,6 +56,37 @@ memcpy:
 	mov eax, [ebp + 8]	; 设置返回值
 
 	pop ecx
+	pop edi
+	pop esi
+	mov esp, ebp
+	pop ebp
+
+	ret
+
+;================================================================================================
+; void memset(void* p_dst, char ch, int size);
+memset:
+    push ebp
+    mov ebp, esp
+
+    push esi
+    push edi
+    push ecx
+
+    mov edi, [ebp + 8]  ; edi -> 目的地地址
+    mov edx, [ebp + 12]	; esi -> 要初始化的字符
+	mov ecx, [ebp + 16]	; ecx <- 计数器（复制的数据大小）
+.1:
+    cmp ecx, 0  ; 判断计数器
+    jz  .2      ; 计数器为零跳出
+
+    mov byte [edi], dl
+    inc edi
+
+    dec ecx     ; 计数器==
+    jmp .1      ; 循环
+.2:
+    pop ecx
 	pop edi
 	pop esi
 	mov esp, ebp
