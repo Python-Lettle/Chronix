@@ -8,25 +8,30 @@
  * github: https://github.com/python-lettle/
  * bilibili: https://space.bilibili.com/420393625
  */
-#include "kernel.h"
+#include "prototype.h"
 #include "global.h"
 #include "components/Terminal.h"
-#include "protect.h"
+#include <type.h>
 
 // 定义全局变量
 struct BOOT_PARAM *boot_param;
 Terminal terminal;
 
+void test_int()
+{
+    terminal.print(&terminal, "Test int Done!!!\n");
+}
+
 
 void kernel_init(void)
 {
-    protect_init();
+    protect_init();     // GDT, IDT, TSS 初始化
+    interrupt_init();   // 中断初始化
 
+    put_irq_handler(3, test_int);
+    interrupt_unlock();
     // Boot params 获取
     boot_param = (struct BOOT_PARAM *)BOOT_PARAM_ADDR;
     // 初始化 Terminal
     Terminal_init(&terminal, 7, 0);
-
-    // data_base = seg2phys();
-
 }

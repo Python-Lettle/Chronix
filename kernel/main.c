@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include "global.h"
+#include "prototype.h"
 
 void chronix_main(void)      // 2001c
 {
@@ -21,14 +22,35 @@ void chronix_main(void)      // 2001c
         char memsize_str[10] = {0};
         terminal.print(&terminal, "OS memory size(KB): ");
         terminal.print(&terminal, itoa(memsize, memsize_str, 10));
-        terminal.print(&terminal, "\n");
+        terminal.new_line(&terminal);
     } else {
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
     terminal.print(&terminal, "root@Chronix$\n");
-    
-    int a=0;
-    int b=11/a;
 
     while (1){ _io_hlt();}
+}
+
+/**
+ *	内核遇到了不可恢复的异常或错误，立即准备宕机
+ */
+void panic(const char* msg, int error_no)
+{
+    /* 有错误消息的话，请先打印 */
+    if(msg != 0) {
+        terminal.print(&terminal, "\n**** Chronix panic:");
+        terminal.print(&terminal, msg);
+        terminal.print(&terminal, " ****");
+        terminal.new_line(&terminal);
+        
+        if(error_no != 0) {
+            terminal.print(&terminal, "**** Panic number:");
+            char err_no_str[10] = {0};
+            itoa(error_no, err_no_str, 10);
+            terminal.print(&terminal, error_no);
+            terminal.print(&terminal, " ****");
+            terminal.new_line(&terminal);
+        }
+    }
+    while(1) {_io_hlt();}
 }

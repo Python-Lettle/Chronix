@@ -21,9 +21,9 @@ extern struct BOOT_PARAM *boot_param;   /* 启动参数 */
 extern Terminal terminal;
 extern Gate idt[IDT_SIZE];
 
+irq_handler_t irq_handler_table[NR_IRQ_VECTORS]; /* interrupt_8259.c */
+
 uint8_t gdt_ptr[6];                     /* kernel.asm */
 uint8_t idt_ptr[6];                     /* IDT指针，同上 */
-
-void _io_hlt(void);                     /* kernel.asm 中的htl*/
 
 #endif

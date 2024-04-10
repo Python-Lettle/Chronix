@@ -25,7 +25,8 @@ LDFLAGS=-m elf_i386 -Tlink.ld
 # 内核文件
 KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o $(TARGET_KERNEL_DIR)/init.o \
 			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o $(TARGET_KERNEL_DIR)/string_asm.o \
-			$(TARGET_KERNEL_DIR)/Terminal.o $(TARGET_KERNEL_DIR)/protect.o $(TARGET_KERNEL_DIR)/exception.o
+			$(TARGET_KERNEL_DIR)/Terminal.o $(TARGET_KERNEL_DIR)/protect.o $(TARGET_KERNEL_DIR)/exception.o \
+			$(TARGET_KERNEL_DIR)/interrupt_8259.o
 
 # 运行选项
 QEMU_RUN_OPTION = -m 64M
@@ -33,6 +34,7 @@ QEMU_RUN_OPTION = -m 64M
 MOUNT_POINT = /mnt/Chronix
 
 all: img
+	@echo "系统构建完成！"
 
 
 boot: $(BOOT_DIR)/boot.asm $(BOOT_DIR)/loader.asm
@@ -66,10 +68,10 @@ debug:
 # 内核文件编译规则
 $(TARGET_KERNEL_DIR)/kernel.o: $(KERNEL_DIR)/kernel.asm
 	mkdir -p $(TARGET_KERNEL_DIR)
-	$(AS) -f elf $(KERNEL_DIR)/kernel.asm -o $(TARGET_KERNEL_DIR)/kernel.o -I bootloader/include
+	$(AS) -f elf $(KERNEL_DIR)/kernel.asm -o $(TARGET_KERNEL_DIR)/kernel.o -I $(KERNEL_DIR)
 
 $(TARGET_KERNEL_DIR)/kernel_lib32.o: $(KERNEL_DIR)/kernel_lib32.asm
-	$(AS) -f elf $(KERNEL_DIR)/kernel_lib32.asm -o $(TARGET_KERNEL_DIR)/kernel_lib32.o -I bootloader/include
+	$(AS) -f elf $(KERNEL_DIR)/kernel_lib32.asm -o $(TARGET_KERNEL_DIR)/kernel_lib32.o -I $(KERNEL_DIR)
 
 $(TARGET_KERNEL_DIR)/main.o: $(KERNEL_DIR)/main.c
 	$(CC) $(CFLAGS) -o $@ $^
@@ -99,4 +101,7 @@ $(TARGET_KERNEL_DIR)/protect.o: $(KERNEL_DIR)/protect.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/exception.o: $(KERNEL_DIR)/exception.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(TARGET_KERNEL_DIR)/interrupt_8259.o: $(KERNEL_DIR)/interrupt_8259.c
 	$(CC) $(CFLAGS) -o $@ $^

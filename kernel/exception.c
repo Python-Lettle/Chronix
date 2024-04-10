@@ -49,22 +49,8 @@ void exception_handler(int int_vector, int err_num)
 
     // 内核发生异常，宕机
     if(exception_table[int_vector] == 0){
-        terminal.print(&terminal,"*****A exception, but it not in table!*****\n");
+        panic("not in table exception", 666);
     } else {
-        terminal.print(&terminal,exception_table[int_vector]);
+        panic(exception_table[int_vector], err_num);
     }
-
-    // 输出错误码
-    if(err_num != 0xffffffff) {
-        char err_num_str[10] = {0};
-        itoa(err_num, err_num_str, 10);
-        terminal.print(&terminal,err_num_str);
-    }
-
-    while (1)
-    {
-        _io_hlt();
-    }
-    
-
 }

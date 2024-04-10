@@ -68,5 +68,7 @@ struct BOOT_PARAM
 
 /* 硬件（异常）中断处理函数原型 */
 typedef void (*int_handler_t)(void);
+/* 中断请求处理函数原型 */
+typedef int (*irq_handler_t)(int irq);
 
 #endif
