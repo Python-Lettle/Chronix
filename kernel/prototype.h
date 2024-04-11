@@ -14,6 +14,11 @@
 
 #include <kernel/type.h>
 
+
+void io_out8(int port, int data);
+void keyboard_init(void);
+int keyboard_handler(int irq);
+
 /**
  *	内核遇到了不可恢复的异常或错误，立即准备宕机
  */
@@ -47,6 +52,8 @@ void interrupt_lock(void);
 void interrupt_unlock(void);
 void enable_irq(int int_request);
 void disable_irq(int int_request);
+
+uint8_t scan_key(void);
 
 /**==================================================
  * kernel.asm

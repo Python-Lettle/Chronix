@@ -28,7 +28,7 @@ in_byte:
     push edx
         mov edx, [esp + 4 * 2]      ; 得到端口号
         xor eax, eax
-        in al, dx              ; port -> al
+        in al, dx                   ; port -> al
         nop                         ; 一点延迟
     pop edx
     nop

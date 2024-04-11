@@ -20,6 +20,10 @@
 #define KERNEL_TEXT_SEG_BASE    0
 #define KERNEL_DATA_SEG_BASE    0
 
+/* Chronix所启用的控制台的数量等定义 */
+#define NR_CONSOLES           	3	/* 系统控制台数量(1 ~ 9) */
+#define	NR_RS_LINES	   		    0	/* rs232终端数量(0 ~ 2) */
+#define	NR_PTYS		  	 	    0	/* 伪终端数量(0 ~ 64) */
 /* 控制器任务的数量（/dev/cN设备类）。 */
 #define NR_CONTROLLERS          1
 /* 系统任务数量 */

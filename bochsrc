@@ -28,7 +28,7 @@ log: bochsout.txt
 mouse: enabled=0
 
 # 键盘映射，我们选用美式键盘为默认
-keyboard: keymap=/usr/share/bochs/keymaps/x11-pc-us.map
+keyboard: keymap=/usr/local/share/bochs/keymaps/x11-pc-us.map
 
 # enable GUI debugger
 display_library: x

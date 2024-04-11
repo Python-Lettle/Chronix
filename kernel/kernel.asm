@@ -1,4 +1,13 @@
 ;============================================================================
+; Copyright (C) 2024 Lettle All rights reserved.
+; See the copyright notice in the file LICENSE.
+; Created by Lettle on 2024/4/7.
+; QQ: 1071445082
+; Email: 1071445082@qq.com
+; gitee: https://gitee.com/lettle/
+; github: https://github.com/python-lettle/
+; bilibili: https://space.bilibili.com/420393625
+;============================================================================
 ;   导入和导出
 ;----------------------------------------------------------------------------
 ; 导入函数
@@ -50,6 +59,7 @@ global	hwint13
 global	hwint14
 global	hwint15
 
+
 %include "asm_const.inc"
 
 ;============================================================================
@@ -83,11 +93,8 @@ _start:     ; 内核程序入口
     mov ax, SELECTOR_TSS
     ltr ax
 
-    int 32+3
-    int 32+9
-
     ; 跳入C语言编写的主函数
-    jmp chronix_main
+    call chronix_main
     
 _io_hlt:
     hlt
@@ -127,6 +134,7 @@ _io_hlt:
     in al, INT_M_CTLMASK    ; 取出 主8259A 当前的屏蔽位图
     and al, ~(1 << %1)      ; 将该中断的屏蔽位复位，表示启用它
     out INT_M_CTLMASK, al   ; 输出新的屏蔽位图，启用该中断
+    sti
 .0:
     ; 这个 ret 指令将会跳转到我们 save 中手动保存的地址，restart 或 restart_reenter
     ret
@@ -192,6 +200,7 @@ hwint07:		; Interrupt routine for irq 7 (printer)，打印机中断
     in al, INT_M_CTLMASK    ; 取出 主8259A 当前的屏蔽位图
     and al, ~(1 <<(%1 - 8))      ; 将该中断的屏蔽位复位，表示启用它
     out INT_M_CTLMASK, al   ; 输出新的屏蔽位图，启用该中断
+    sti
 .0:
     ; 这个 ret 指令将会跳转到我们 save 中手动保存的地址，restart 或 restart_reenter
     ret
@@ -296,3 +305,8 @@ exception:
 .down:
 	hlt                 ; CPU停止运转，宕机
     jmp .down
+
+; asm_key_handler:
+;     in al, 0x60
+
+;     out 

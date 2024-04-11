@@ -26,7 +26,7 @@ LDFLAGS=-m elf_i386 -Tlink.ld
 KERNEL_FILE = $(TARGET_KERNEL_DIR)/kernel.o $(TARGET_KERNEL_DIR)/kernel_lib32.o $(TARGET_KERNEL_DIR)/main.o $(TARGET_KERNEL_DIR)/init.o \
 			$(TARGET_KERNEL_DIR)/stdio.o $(TARGET_KERNEL_DIR)/stdlib.o $(TARGET_KERNEL_DIR)/type.o $(TARGET_KERNEL_DIR)/string.o $(TARGET_KERNEL_DIR)/string_asm.o \
 			$(TARGET_KERNEL_DIR)/Terminal.o $(TARGET_KERNEL_DIR)/protect.o $(TARGET_KERNEL_DIR)/exception.o \
-			$(TARGET_KERNEL_DIR)/interrupt_8259.o
+			$(TARGET_KERNEL_DIR)/interrupt_8259.o $(TARGET_KERNEL_DIR)/keyboard.o
 
 # 运行选项
 QEMU_RUN_OPTION = -m 64M
@@ -104,4 +104,7 @@ $(TARGET_KERNEL_DIR)/exception.o: $(KERNEL_DIR)/exception.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(TARGET_KERNEL_DIR)/interrupt_8259.o: $(KERNEL_DIR)/interrupt_8259.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(TARGET_KERNEL_DIR)/keyboard.o: $(KERNEL_DIR)/keyboard.c
 	$(CC) $(CFLAGS) -o $@ $^

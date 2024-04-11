@@ -9,8 +9,8 @@
  * bilibili: https://space.bilibili.com/420393625
  */
 #include "global.h"
-#include "components/Terminal.h"
 #include <stdlib.h>
+#include "prototype.h"
 
 /**
  * @brief 中断初始化
@@ -46,8 +46,6 @@ void interrupt_init(void)
     for(; i < NR_IRQ_VECTORS; i++) {
         irq_handler_table[i] = default_irq_handler;
     }
-
-    interrupt_unlock();
 }
 
 /*=========================================================================*

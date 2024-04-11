@@ -137,7 +137,7 @@ void init_gate(uint8_t vector,uint8_t desc_type,int_handler_t handler,uint8_t pr
     p_gate->selector = SELECTOR_KERNEL_CS;
     p_gate->dcount = 0;
     p_gate->attr = desc_type | (privilege << 5);
-    // p_gate->offset_high = (base_addr >> 16) & 0xFFFF;
+    p_gate->offset_high = (base_addr >> 16) & 0xFFFF;
 }
 
 /*=========================================================================*

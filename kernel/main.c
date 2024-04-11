@@ -26,9 +26,18 @@ void chronix_main(void)      // 2001c
     } else {
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
-    terminal.print(&terminal, "root@Chronix$\n");
+    keyboard_init();
+    interrupt_unlock();     // 放在别的地方就无了
 
-    while (1){ _io_hlt();}
+    terminal.print(&terminal, "root@Chronix$ ");
+
+    // 不能让内核陷入hlt 不然键盘中断就无了
+    int a=0;
+    while (1)
+    {
+        a++;
+    }
+    
 }
 
 /**
