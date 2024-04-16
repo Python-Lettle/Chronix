@@ -15,7 +15,7 @@ INCLUDE_DIR = include
 
 IMG_NAME = Chronix.img
 
-ENTRY_POINT = 0x2000
+ENTRY_POINT = 0x7e10
 # 编译选项
 # -g产生调试信息
 # -fno-builtin 不采用C语言的内建函数，解决与内建函数重名问题。

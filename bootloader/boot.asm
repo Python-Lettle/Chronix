@@ -18,7 +18,7 @@ FILE_NAME_LENGTH equ 11             ; 文件名8字节加扩展名3字节共11�
 DIR_ENTRY_PER_SECTOR equ 16         ; 每个扇区能存放目录项的数目。
 DIR_FstClus     equ    26    ; 2     起始簇号
 
-KERNEL_ENTRY_POINT equ 0x2000
+KERNEL_ENTRY_POINT equ 0x7e10
 
 org 0x7c00
 jmp _start16
