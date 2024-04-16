@@ -28,14 +28,24 @@
 typedef struct Terminal Terminal; // 前向声明结构体类型 
 struct Terminal
 {
+    //====================
+    // 属性区
+    //====================
     // 光标位置
     int row;
     int col;
+
+    // 可删除字符数
+    int deletable;
 
     // 输入缓冲区
     char input_buffer[TERMINAL_INPUT_BUFFER_SIZE];
     uint8_t buffer_index;       // 缓冲区下一个可占用下标，从0开始依次增加，输出后一次清零
 
+
+    //====================
+    // 函数区
+    //====================
     /**
      * @brief 终端输出
      * 

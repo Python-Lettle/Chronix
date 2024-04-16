@@ -36,7 +36,8 @@ _TERMINAL_FUNC_NOARG(Terminal_print_buffer)
 {
     self->input_buffer[self->buffer_index] = '\0'; // 调整要输出的字符串
     self->print(self, self->input_buffer);
-    
+    self->deletable += self->buffer_index;
+
     // 将缓冲区及其下标置0
     self->buffer_index = 0;
     self->input_buffer[0] = '\0';
@@ -50,6 +51,7 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
         if(*str == '\n' || *str == 13) {
             self->new_line(self);
         } else if (*str == 8) {
+            if(self->deletable>0) self->deletable--;
             self->backspace(self);
         } else {
             putchar(*str, self->row, self->col++);
@@ -83,13 +85,16 @@ _TERMINAL_FUNC_NOARG(Terminal_refresh_cursor)
 
 _TERMINAL_FUNC_NOARG(Terminal_backspace)
 {
-    if (self->col == 0) {
-        if (self->row == 0) return;
-        putchar(' ', self->row, self->col);
-        self->row -= 1;
-        self->col = 79;
-    } else {
-        putchar(' ', self->row, --self->col);
+    if (self->deletable > 0) {
+        self->deletable--;
+        if (self->col == 0) {
+            if (self->row == 0) return;
+            putchar(' ', self->row, self->col);
+            self->row--;
+            self->col = 79;
+        } else {
+            putchar(' ', self->row, --self->col);
+        }
     }
 }
 
@@ -97,6 +102,7 @@ void Terminal_init(Terminal *terminal, int row, int col)
 {
     terminal->row = row;
     terminal->col = col;
+    terminal->deletable = 0;
     terminal->print = Terminal_print;
     terminal->new_line = Terminal_new_line;
     terminal->in_char = Terminal_input;
