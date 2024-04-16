@@ -230,8 +230,7 @@ int keyboard_handler(int irq)
     uint8_t scan_code = scan_key();
     uint32_t ch = key_make_break(scan_code);
     if(ch != -1) {
-        char chs[2] = {ch, 0};
-        terminal.print(&terminal, chs);
+        terminal.in_char(&terminal, ch);
     }
 
     if(input_count < KEYBOARD_IN_BYTES) {   /* Buffer available. */

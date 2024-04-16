@@ -63,7 +63,7 @@ typedef struct seg_descriptor_s
  */
 struct BOOT_PARAM
 {
-    int memsize;
+    uint32_t memsize;
 };
 
 /* 硬件（异常）中断处理函数原型 */

@@ -14,8 +14,6 @@
 
 #include <kernel/type.h>
 
-
-void io_out8(int port, int data);
 void keyboard_init(void);
 int keyboard_handler(int irq);
 
@@ -23,7 +21,8 @@ int keyboard_handler(int irq);
  *	内核遇到了不可恢复的异常或错误，立即准备宕机
  */
 void panic(const char* msg, int error_no);
-void _io_hlt(void);                     /* kernel.asm 中的htl*/
+void _nop(void);
+void _io_hlt(void);                     /* kernel.asm 中的hlt*/
 
 //============================================================
 // init.c

@@ -23,6 +23,7 @@ extern irq_handler_table            ; global.h 硬件中断请求处理例程表
 ; 导出函数
 global _start                       ; 导出_start程序开始符号，链接器需要它
 global _io_hlt
+global _nop                         ; 什么也不做函数
 
 ; 异常处理
 global divide_error
@@ -95,10 +96,18 @@ _start:     ; 内核程序入口
 
     ; 跳入C语言编写的主函数
     call chronix_main
-    
+
+    jmp $
+
+_nop:
+    nop
+    ret
+
 _io_hlt:
+    sti
     hlt
-	ret
+    cli
+    ret
 
 ;============================================================================
 ;   硬件中断处理

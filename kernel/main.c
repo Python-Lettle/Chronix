@@ -13,13 +13,12 @@
 #include "global.h"
 #include "prototype.h"
 
-void chronix_main(void)      // 2001c
+void chronix_main()
 {
-
     // Print memory size
     if (boot_param->memsize != 0) {
         int memsize = boot_param->memsize / 1024;       // KB
-        char memsize_str[10] = {0};
+        char memsize_str[16] = {0};
         terminal.print(&terminal, "OS memory size(KB): ");
         terminal.print(&terminal, itoa(memsize, memsize_str, 10));
         terminal.new_line(&terminal);
@@ -61,5 +60,5 @@ void panic(const char* msg, int error_no)
             terminal.new_line(&terminal);
         }
     }
-    while(1) {_io_hlt();}
+    while(1) {}
 }

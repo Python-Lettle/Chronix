@@ -1,37 +1,27 @@
-;========================================
-; 常量
-;========================================
-; FAT16目录项中各成员的偏移量：
-; 名称                 偏移     长度    描述
-DIR_Name        equ    0     ; 11    文件名8B，扩展名3B
-DIR_Attr        equ    11    ; 1     目录项属性
-;Reserved       equ    12    ; 10    保留位
-DIR_WrtTime     equ    22    ; 2     最后一次写入时间
-DIR_WrtDate     equ    24    ; 2     最后一次写入日期
+;============================================================================
+; Copyright (C) 2024 Lettle All rights reserved.
+; See the copyright notice in the file LICENSE.
+; Created by Lettle on 2024/4/16.
+; QQ: 1071445082
+; Email: 1071445082@qq.com
+; gitee: https://gitee.com/lettle/
+; github: https://github.com/python-lettle/
+; bilibili: https://space.bilibili.com/420393625
+;============================================================================
+; 常量定义区
+DISK_BUFFER equ 0x1000              ; 读磁盘用的缓存区
+DISK_SIZE_M equ 4                   ; 磁盘容量，单位M。
+SECTOR_NUM_OF_FAT1_START equ 1      ; FAT1起始扇区号
+SECTOR_NUM_OF_ROOT_DIR_START equ 33 ; 根目录起始扇区号
+SECTOR_CLUSTER_BALANCE equ 63       ; 簇号加上该值正好对应扇区号。
+FILE_NAME_LENGTH equ 11             ; 文件名8字节加扩展名3字节共11字节。
+DIR_ENTRY_PER_SECTOR equ 16         ; 每个扇区能存放目录项的数目。
 DIR_FstClus     equ    26    ; 2     起始簇号
-DIR_FileSize    equ    28    ; 4     文件大小
 
-DISK_SIZE_M equ 4                           ; 磁盘容量，单位M。
-FAT1_SECTORS     equ 32                     ; FAT1占用扇区数
-ROOT_DIR_SECTORS equ 32                     ; 根目录占用扇区数
-SECTOR_NUM_OF_FAT1_START     equ 1          ; FAT1表起始扇区号
-SECTOR_NUM_OF_ROOT_DIR_START equ 33         ; 根目录区起始扇区号
-SECTOR_NUM_OF_DATA_START     equ 65         ; 数据区起始扇区号，对应簇号为2。
-SECTOR_CLUSTER_BALANCE       equ 63         ; 簇号加上该值正好对应扇区号。
-FILE_NAME_LENGTH     equ 11                 ; 文件名8字节加扩展名3字节共11字节。
-DIR_ENTRY_SIZE       equ 32                 ; 目录项为32字节。
-DIR_ENTRY_PER_SECTOR equ 16                 ; 每个扇区能存放目录项的数目。
+KERNEL_ENTRY_POINT equ 0x2000
 
-VIDEO_CHAR_MAX_COUNT equ 2000
-BaseOfStack equ 0x7c00
-
-%include "addresses.inc"
-
-;========================================
-; 跳入引导程序 定义FAT16参数
-;========================================
 org 0x7c00
-jmp boot_start
+jmp _start16
 nop
 
 ;FAT16参数区：
@@ -55,107 +45,197 @@ BS_VolID		dd 0x00000000   ; 卷序列号
 BS_VolLab		db 'Chronix    '; 卷标（11字节，含空格）
 BS_FileSysType	db 'FAT16   '	; 文件系统类型（8字节，含空格）
 
-
-[BITS 16]  ; 设置为16位模式
-;========================================
-; 引导程序开始
-;========================================
-boot_start:
-    ; 初始化寄存器
-    mov ax,cs
-    mov ds,ax
-    mov es,ax                   ; cmpsb会用到ds:si和es:di
-    mov ss,ax
-    mov sp, BaseOfStack
-    mov ax, VIDEO_SEGMENT_ADDRESS
-    mov gs,ax                   ; 本程序中gs专用于指向显存段
-
+[bits 16]
+_start16:
     ; 清屏
-    call clear_screen
+    mov ax, 0600h
+    mov bx, 0700h
+    mov cx, 0
+    mov dx, 184fh
+    int 10h     ; 调用0x10号中断
 
-    
+    cli             ; 屏蔽中断
+    lgdt [GDTPtr]   ; 初始化GDT
+    ; 把 cr0 的最低位置为 1，开启保护模式
+    mov eax, cr0
+    or eax, 0x1
+    mov cr0, eax
+    jmp Selector_code:PModeMain
+ 
+[bits 32]
+PModeMain:
+    mov ax, 0x10        ; 将数据段寄存器ds和附加段寄存器es置为0x10
+    mov ds, ax         
+    mov es, ax
+    mov fs, ax          ; fs和gs寄存器由操作系统使用，这里统一设成0x10
+    mov gs, ax
+    mov ax, 0x18        ; 将栈段寄存器ss置为0x18
+    mov ss, ax
+    mov ebp, 0x7c00     ; 现在栈顶指向 0x7c00
+    mov esp, ebp
 
-    ; 读取loader文件开始
-    ; 读取根目录的第1个扇区（1个扇区可以存放16个目录项，我们用到的文件少，不会超过16个。）
-    mov esi,SECTOR_NUM_OF_ROOT_DIR_START 
-    mov di,DISK_BUFFER
-    call read_one_sector16
+    ;--------------------
+    ; 寻找内核文件
+    ;--------------------
+    ; 读取根目录的第1个扇区(1个扇区可以存放16个目录项)【计划根目录目录项个数不能超过16个】
+    mov esi,SECTOR_NUM_OF_ROOT_DIR_START
+    mov edi,DISK_BUFFER 
+    mov ecx,1                   ; 读取1个扇区
+    call read_one_sector32
 
-    ; 打印字符串："Chronix boot start."
-    mov si,boot_start_string
-    mov di,0 ;在屏幕第1行显示
-    call print16
-
-    ; 在16个目录项中通过文件名查找文件
-    cld                             ; cld将标志位DF置0，在串处理指令中控制每次操作后让si和di自动递增。std相反。下面repe cmpsb会用到。
-    mov bx,0                        ; 用bx记录遍历第几个目录项。
-next_dir_entry:
+    ; 查找kernel.bin文件
+    cld         ; cld告诉程序si，di向地址增加的方向移动，std相反。
+    mov bx,0    ; bx用来记录遍历的目录项序号(0~15)。
+    next_dir_entry:
     mov si,bx
-    shl si,5                        ; 乘以32（目录项的大小）
-    add si,DISK_BUFFER              ; 源地址指向目录项中的文件名。
-    mov di,loader_file_name_string  ; 目标地址指向loader程序在硬盘中的正确文件名。
-    mov cx,FILE_NAME_LENGTH         ; 字符比较次数为FAT16文件名长度，每比较一个字符，cx会自动减一。
-    repe cmpsb                      ; 逐字节比较ds:si和es:di指向的两个字符串。
-    jcxz loader_found               ; 当cx为0时跳转。cx为0表示上面比较的两个字符串相同。找到了loader文件。
+    shl si,5    ; 乘以32
+    add si,DISK_BUFFER              ; 指向目录项中的文件名
+    mov di,kernel_file_name_string  ; 指向kernel文件名
+    mov cx,FILE_NAME_LENGTH         ; 文件名长度
+    repe cmpsb                      ; 如果相等则比较下一个字节，直到ZF为0或CX为0，ZF为0表示发现不相等的字节，CX为0表示这一串字节相等。
+    jcxz kernel_found               ; cx=0
     inc bx
     cmp bx,DIR_ENTRY_PER_SECTOR
-    jl next_dir_entry               ; 检查下一个目录项。
-    jmp loader_not_found            ; 没有找到loader文件。
+    jl next_dir_entry
+    jmp kernel_not_found
 
-loader_found:
-    ; 从目录项中获取loader文件的起始簇号
-    shl bx,5 ; 乘以32
-    add bx,DISK_BUFFER
-    mov bx,[bx+DIR_FstClus]         ; loader的起始簇号
+    kernel_found:
+    ; 获取kernel起始簇号
+    shl bx,5                ; 目录项序号乘以32得到目录项的偏移量
+    add bx,DISK_BUFFER      ; 目录项在内存中的地址
+    mov bx,[bx+DIR_FstClus] ; 保存kernel的起始簇号
 
-    ; 读取FAT1表的第1个扇区（我们用到的文件少且小，只用到了该扇区中的簇号）
+    ; 读取FAT1的第1个扇区
     mov esi,SECTOR_NUM_OF_FAT1_START 
-    mov di,DISK_BUFFER              ; 放到boot程序之后
-    call read_one_sector16
+    mov edi,DISK_BUFFER 
+    call read_one_sector32
 
-    ; 按簇读loader
-    mov bp,LOADER_SEG           ; loader文件内容读取到内存中的起始地址
-read_loader:
-    xor esi,esi                     ; esi清零
-    mov si,bx                       ; 簇号
+    ; 按簇读kernel
+    mov ebp,KERNEL_ENTRY_POINT ; 目标地址初值
+    read_kernel:
+    xor esi,esi
+    mov si,bx
     add esi,SECTOR_CLUSTER_BALANCE
-    mov di,bp
-    call read_one_sector16
-    add bp,512                      ; 下一个目标地址
+    mov edi,ebp
+    call read_one_sector32
+    add ebp,512 ; 下一个目标地址
 
     ; 获取下一个簇号（每个FAT表项为2字节）
-    shl bx,1                        ; 乘2，每个FAT表项占2个字节
+    shl bx,1                ; 乘2，每个FAT表项占2个字节
     mov bx,[bx+DISK_BUFFER]
+    cmp bx,0xfff8           ; 大于等于0xfff8表示文件的最后一个簇
+    jb read_kernel          ; jb无符号小于则跳转，jl有符号小于则跳转。
 
-    ;判断下一个簇号
-    cmp bx,0xfff8       ; 大于等于0xfff8表示文件的最后一个簇
-    jb read_loader      ; jb无符号小于则跳转，jl有符号小于则跳转。
-
-read_loader_finish: ; 读取loader文件结束
-    ; 打印字符串："Loader found, jumping..."
-    mov si,loader_found_string
-    mov di,80 ; 在屏幕第2行显示
-    call print16
-    jmp LOADER_SEG  ; 跳转到loader在内存中的地址
-
-loader_not_found: ; 没有找到loader文件。
-    ; 打印字符串："Loader not found."
-    mov si,loader_not_found_string
-    mov di,80 ; 在屏幕第2行显示
-    call print16
-
-stop:
+    goto_kernel:
+    ; push kernel_found_str
+    ; call Print
+    jmp dword KERNEL_ENTRY_POINT ; 跳转到kernel
+    jmp stop32
+    
+kernel_not_found:
+stop32:
     hlt
-    jmp stop
+    jmp stop32
 
-%include "util16.inc"
+; 变量 ---
+; ddDispPosition: dd 0xb8000 +  (80 * 1 + 0) * 2
+; 字符串常量
+kernel_file_name_string: db 'KERNEL  BIN', 0
+; kernel_found_str: db "Kernel Found", 10, 0
 
-DISK_BUFFER equ 0x1e00 ;读磁盘用的缓存区，放到kernel之前的512字节。
+;============================================================================
+; GDT
+;============================================================================
+gdt_start:
+; 第一个描述符必须是空描述符
+gdt_null:
+    dd 0
+    dd 0
+; 代码段描述符
+gdt_code:
+    dw 0xffff ; Limit (bits 0-15)
+    dw 0x0 ; Base (bits 0-15)
+    db 0x0 ; Base (bits 16-23)
+    db 10011010b ; Access Byte
+    db 11001111b ; Flags , Limit (bits 16-19)
+    db 0x0 ; Base (bits 24-31)
+; 数据段描述符
+gdt_data:
+    dw 0xffff ; Limit (bits 0-15)
+    dw 0x0 ; Base (bits 0-15)
+    db 0x0 ; Base (bits 16-23)
+    db 10010010b ; Access Byte
+    db 11001111b ; Flags , Limit (bits 16-19)
+    db 0x0 ; Base (bits 24-31)
+; 栈段描述符
+gdt_stack:
+    dw 0x7c00 ; Limit (bits 0-15)
+    dw 0x0 ; Base (bits 0-15)
+    db 0x0 ; Base (bits 16-23)
+    db 10010010b ; Access Byte
+    db 01000000b ; Flags , Limit (bits 16-19)
+    db 0x0 ; Base (bits 24-31)
+gdt_end:
+ 
+; GDT descriptior
+GDTPtr:
+    dw gdt_end - gdt_start - 1 ; Size of our GDT, always less one of the true size
+    dd gdt_start ; Start address of our GDT
 
-loader_file_name_string:db "LOADER  BIN",0          ; 文件名 11字节
-boot_start_string:db "Chronix boot start.",0
-loader_not_found_string:db "Loader not found.",0
-loader_found_string:db "Loader found, jumping...",0
+; 段选择子
+Selector_code    equ gdt_code - gdt_start
+
+;============================================================================
+; 读取硬盘1个扇区函数（主通道主盘）【经测试，一次读多个扇区会有各种问题，需要分开一个扇区一个扇区的读。】
+; 输入参数：esi，edi。
+; 输出参数：无。
+; esi 起始LBA扇区号
+; edi 将数据写入的内存地址
+;----------------------------------------------------------------------------
+read_one_sector32:
+    ; 第1步：设置要读取的扇区数
+    mov dx,0x1f2
+    mov al,1
+    out dx,al ;读取的扇区数
+    ; 第2步：将LBA地址存入0x1f3~0x1f6
+    mov eax,esi
+    ; LBA地址7~0位写入端口0x1f3
+    mov dx,0x1f3
+    out dx,al
+    ; LBA地址15~8位写入端口写入0x1f4
+    shr eax,8
+    mov dx,0x1f4
+    out dx,al
+    ; LBA地址23~16位写入端口0x1f5
+    shr eax,8
+    mov dx,0x1f5
+    out dx,al
+    ; LBA28模式
+    shr eax,8
+    and al,0x0f ; LBA第24~27位
+    or al,0xe0  ; 设置7~4位为1110，表示LBA模式，主盘
+    mov dx,0x1f6
+    out dx,al
+    ; 第3步：向0x1f7端口写入读命令0x20
+    mov dx,0x1f7
+    mov al,0x20
+    out dx,al
+    ; 第4步：检测硬盘状态【该方法IDE硬盘正常，但SATA硬盘会表现为一直忙，无限循环卡在这里。】
+    .not_ready:
+    nop
+    in al,dx    ; 读0x1f7端口
+    and al,0x88 ; 第3位为1表示硬盘控制器已准备好数据传输，第7位为1表示硬盘忙。
+    cmp al,0x08
+    jnz .not_ready ; 若未准备好，继续等
+    ; 第5步：从0x1f0端口读数据
+    mov cx,256  ; 每次读取2字节，一个扇区需要读256次。
+    mov dx,0x1f0
+    .go_on_read:
+    in ax,dx
+    mov [edi],ax
+    add edi,2
+    loop .go_on_read
+    ret
 
 times 510-($-$$) db 0
 db 0x55,0xaa
