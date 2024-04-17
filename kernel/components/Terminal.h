@@ -16,7 +16,7 @@
 
 // 终端标准函数头
 #define _TERMINAL_FUNC_NOARG(funcname) void funcname(Terminal *self)
-#define _TERMINAL_FUNC(funcname, args) void funcname(Terminal *self, args)
+#define _TERMINAL_FUNC(funcname, args ...) void funcname(Terminal *self, args)
 
 // 终端缓冲区大小
 #define TERMINAL_INPUT_BUFFER_SIZE 32
@@ -54,6 +54,15 @@ struct Terminal
      * @param str 需要输出的字符串
      */
     void (*print)(Terminal *self, const char *str);
+
+    /**
+     * @brief 终端输出
+     * 
+     * @param self 指向 Terminal 对象的指针
+     * @param num 需要输出的数字
+     * @param base 以几进制的形式输出
+     */
+    void (*print_int)(Terminal *self, int num, int base);
 
     /**
      * @brief 退格，即删除上一个

@@ -75,6 +75,13 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
     // self->refresh_cursor(self);
 }
 
+_TERMINAL_FUNC(Terminal_print_int, int num, int base)
+{
+    char num_str[16] = {0};
+    itoa(num, num_str, base);
+    self->print(self, num_str);
+}
+
 /**
  * @brief 换行
  */
@@ -153,6 +160,7 @@ void Terminal_init(Terminal *terminal, int row, int col)
     terminal->col = col;
     // terminal->deletable = 0;
     terminal->print = Terminal_print;
+    terminal->print_int = Terminal_print_int;
     terminal->new_line = Terminal_new_line;
     terminal->in_char = Terminal_input;
     terminal->print_buffer = Terminal_print_buffer;

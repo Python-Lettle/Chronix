@@ -15,16 +15,6 @@
 
 void chronix_main()
 {
-    // Print memory size
-    if (boot_param->memsize != 0) {
-        int memsize = boot_param->memsize / 1024;       // KB
-        char memsize_str[16] = {0};
-        terminal.print(&terminal, "OS memory size(KB): ");
-        terminal.print(&terminal, itoa(memsize, memsize_str, 10));
-        terminal.new_line(&terminal);
-    } else {
-        terminal.print(&terminal, "Can not calculate memory size.\n");
-    }
     keyboard_init();
     interrupt_unlock();     // 放在别的地方就无了
 
