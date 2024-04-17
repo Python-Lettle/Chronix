@@ -17,10 +17,12 @@
 ```
 .
 ├── bootloader
+├── doc
 ├── Chronix.img
 ├── include
 ├── kernel
 ├── link.ld
+├── bochsrc
 ├── Makefile
 └── target
 ```
@@ -41,25 +43,29 @@ make image
 
 
 
-### 3. 构建内核
+### 3. 运行系统
 
-```bash
-make kernel
-```
-
-
-
-### 4. 镜像制作
-
-使用**挂载、UltraISO**等方式将`target`目录下的`loader.bin`和`kernel.bin`放到`Chronix.img`中。
-
-
-
-### 5. 运行系统
+使用qemu启动内核
 
 ```bash
 make run
 ```
+
+使用qemu调试内核
+
+```bash
+make debug
+```
+
+
+
+使用bochs启动内核
+
+```bash
+bochs -q
+```
+
+
 
 
 
