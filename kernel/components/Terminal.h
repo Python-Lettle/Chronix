@@ -36,7 +36,8 @@ struct Terminal
     int col;
 
     // 可删除字符数
-    int deletable;
+    char input_command[2000];
+    int input_command_index;
 
     // 输入缓冲区
     char input_buffer[TERMINAL_INPUT_BUFFER_SIZE];
@@ -75,6 +76,13 @@ struct Terminal
     void (*in_char)(Terminal *self, char ch);
 
     void (*refresh_cursor)(Terminal *self);
+
+    /**
+     * @brief 解析命令
+     */
+    void (*command_exec)(Terminal *self);
+
+    void (*show_head)(Terminal *self);
 };
 
 /**

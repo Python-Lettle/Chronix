@@ -28,7 +28,7 @@ void chronix_main()
     keyboard_init();
     interrupt_unlock();     // 放在别的地方就无了
 
-    terminal.print(&terminal, "root@Chronix$ ");
+    terminal.show_head(&terminal);
 
     // 不能让内核陷入hlt 不然键盘中断就无了
     int a=0;

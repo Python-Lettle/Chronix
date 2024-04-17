@@ -18,14 +18,28 @@
 //========================================
 _TERMINAL_FUNC(Terminal_input, char ch)
 {
-    self->input_buffer[self->buffer_index++] = ch;
-
-    // char code[10] = {0};
-    // itoa(ch, code, 10);
-    // self->print(self, code);
-
-    // 条件允许的情况下输出缓冲区
-    self->print_buffer(self);
+    switch (ch)
+    {
+    case 8:
+        /* 删除 */
+        self->backspace(self);
+        // 删缓存区
+        if (self->buffer_index > 0) {
+            self->input_buffer[self->buffer_index] = '\0';
+            self->buffer_index--;
+        }
+        break;
+    case '\n':
+    case 13:
+        self->command_exec(self);
+        break;
+    default:
+        self->input_buffer[self->buffer_index++] = ch;
+        self->input_command[++self->input_command_index] = ch;
+        // 条件允许的情况下输出缓冲区
+        self->print_buffer(self);
+        break;
+    }
 }
 
 //========================================
@@ -34,9 +48,9 @@ _TERMINAL_FUNC(Terminal_input, char ch)
 // print_buffer
 _TERMINAL_FUNC_NOARG(Terminal_print_buffer)
 {
+    // 向屏幕输出缓冲区内容
     self->input_buffer[self->buffer_index] = '\0'; // 调整要输出的字符串
     self->print(self, self->input_buffer);
-    self->deletable += self->buffer_index;
 
     // 将缓冲区及其下标置0
     self->buffer_index = 0;
@@ -51,7 +65,6 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
         if(*str == '\n' || *str == 13) {
             self->new_line(self);
         } else if (*str == 8) {
-            if(self->deletable>0) self->deletable--;
             self->backspace(self);
         } else {
             putchar(*str, self->row, self->col++);
@@ -59,10 +72,12 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
         str++;
     }
 
-    self->refresh_cursor(self);
+    // self->refresh_cursor(self);
 }
 
-
+/**
+ * @brief 换行
+ */
 _TERMINAL_FUNC_NOARG(Terminal_new_line)
 {
     self->row++;
@@ -85,8 +100,11 @@ _TERMINAL_FUNC_NOARG(Terminal_refresh_cursor)
 
 _TERMINAL_FUNC_NOARG(Terminal_backspace)
 {
-    if (self->deletable > 0) {
-        self->deletable--;
+    if (self->input_command_index >= 0) {
+        // 删除命令区字符
+        self->input_command[self->input_command_index--] = '\0';
+
+        // 删除屏幕上的字符
         if (self->col == 0) {
             if (self->row == 0) return;
             putchar(' ', self->row, self->col);
@@ -98,18 +116,55 @@ _TERMINAL_FUNC_NOARG(Terminal_backspace)
     }
 }
 
+_TERMINAL_FUNC_NOARG(Terminal_show_head)
+{
+    self->print(self, "root@Chronix$ ");
+}
+
+_TERMINAL_FUNC_NOARG(Terminal_command_exec)
+{
+    // 先折行
+    self->new_line(self);
+
+    // 调整命令
+    self->input_command[++self->input_command_index] = '\0';
+
+    // 解析命令
+    char * command = self->input_command;
+    if (!strcmp(command, "ls")) {
+        self->print(self, ". ..");
+    } else {
+        self->print(self, "command not found: ");
+        self->print(self, command);
+    }
+    
+    // 清空命令
+    self->input_command[0] = '\0';
+    self->input_command_index = -1;
+
+    // 显示新的终端提示
+    self->new_line(self);
+    self->show_head(self);
+}
+
 void Terminal_init(Terminal *terminal, int row, int col)
 {
     terminal->row = row;
     terminal->col = col;
-    terminal->deletable = 0;
+    // terminal->deletable = 0;
     terminal->print = Terminal_print;
     terminal->new_line = Terminal_new_line;
     terminal->in_char = Terminal_input;
     terminal->print_buffer = Terminal_print_buffer;
     terminal->refresh_cursor = Terminal_refresh_cursor;
+    
     terminal->backspace = Terminal_backspace;
+    terminal->show_head = Terminal_show_head;
+    terminal->command_exec = Terminal_command_exec;
 
     terminal->input_buffer[0] = '\0';
     terminal->buffer_index = 0;
+
+    terminal->input_command[0] = '\0';
+    terminal->input_command_index = -1;
 }
