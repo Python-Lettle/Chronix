@@ -120,6 +120,7 @@ _TERMINAL_FUNC_NOARG(Terminal_backspace)
         } else {
             putchar(' ', self->row, --self->col);
         }
+        self->refresh_cursor(self);
     }
 }
 
