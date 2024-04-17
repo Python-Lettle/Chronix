@@ -312,8 +312,3 @@ exception:
 .down:
 	hlt                 ; CPU停止运转，宕机
     jmp .down
-
-; asm_key_handler:
-;     in al, 0x60
-
-;     out 

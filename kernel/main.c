@@ -21,11 +21,7 @@ void chronix_main()
     terminal.show_head(&terminal);
 
     // 不能让内核陷入hlt 不然键盘中断就无了
-    int a=0;
-    while (1)
-    {
-        a++;
-    }
+    while (1){}
     
 }
 
@@ -38,17 +34,13 @@ void panic(const char* msg, int error_no)
     if(msg != 0) {
         terminal.print(&terminal, "\n**** Chronix panic:");
         terminal.print(&terminal, msg);
-        terminal.print(&terminal, " ****");
-        terminal.new_line(&terminal);
-        
+        terminal.print(&terminal, " ****\n");
         if(error_no != 0) {
             terminal.print(&terminal, "**** Panic number:");
-            char err_no_str[10] = {0};
-            itoa(error_no, err_no_str, 10);
-            terminal.print(&terminal, error_no);
-            terminal.print(&terminal, " ****");
-            terminal.new_line(&terminal);
+            terminal.print_int(&terminal, error_no, 16);
+            terminal.print(&terminal, " ****\n");
         }
     }
+    // 陷入死循环 不可操作
     while(1) {}
 }

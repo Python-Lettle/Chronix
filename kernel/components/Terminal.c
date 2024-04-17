@@ -72,7 +72,7 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
         str++;
     }
 
-    // self->refresh_cursor(self);
+    self->refresh_cursor(self);
 }
 
 _TERMINAL_FUNC(Terminal_print_int, int num, int base)
@@ -98,11 +98,11 @@ _TERMINAL_FUNC_NOARG(Terminal_new_line)
 
 _TERMINAL_FUNC_NOARG(Terminal_refresh_cursor)
 {
-    unsigned short position = self->row * 80 + self->col; // 假设屏幕宽度为80个字符
-    out_byte(0x3D4, position & 0xFF); // 设置低8位
-    out_byte(0x3D5, (position >> 8) & 0xFF); // 设置高8位
-    out_byte(0x3D4, 0x0F);
-    out_byte(0x3D5, 0x0F);
+    uint16_t position = self->row * 80 + self->col; // 假设屏幕宽度为80个字符
+    out_byte(0x3D4, 14); // 设置低8位
+    out_byte(0x3D5, position >> 8); // 设置高8位
+    out_byte(0x3D4, 15);
+    out_byte(0x3D5, position);
 }
 
 _TERMINAL_FUNC_NOARG(Terminal_backspace)
