@@ -39,7 +39,7 @@ all: img
 
 boot: $(BOOT_DIR)/boot.asm
 	$(AS) $(BOOT_DIR)/boot.asm -o $(TARGET_DIR)/boot.bin -I $(BOOT_DIR)/include
-# $(AS) $(BOOT_DIR)/loader.asm -o $(TARGET_DIR)/loader.bin -I $(BOOT_DIR)/include
+	$(AS) $(BOOT_DIR)/loader.asm -o $(TARGET_DIR)/loader.bin -I $(BOOT_DIR)/include
 
 kernel: $(KERNEL_FILE)
 	mkdir -p $(TARGET_KERNEL_DIR)
@@ -50,6 +50,7 @@ img: boot kernel
 	dd if=/dev/zero of=$(IMG_NAME) bs=512 count=2880
 	dd if=$(TARGET_DIR)/boot.bin of=$(IMG_NAME) conv=notrunc bs=512 count=1
 	sudo mount $(IMG_NAME) $(MOUNT_POINT)
+	sudo cp -fv $(TARGET_DIR)/loader.bin $(MOUNT_POINT)
 	sudo cp -fv $(TARGET_DIR)/kernel.bin $(MOUNT_POINT)
 	sudo umount $(MOUNT_POINT)
 

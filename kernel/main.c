@@ -18,6 +18,16 @@ void chronix_main()
     keyboard_init();
     interrupt_unlock();     // 放在别的地方就无了
 
+    // Print memory size
+    uint32_t memsize = boot_param->memsize / 1024 /1024;       // MB
+    if (memsize != 0) {
+        terminal.print(&terminal, "OS memory size(MB): ");
+        terminal.print_int(&terminal, memsize, 10);
+        terminal.print(&terminal, "\n");
+    } else {
+        terminal.print(&terminal, "Can not calculate memory size.\n");
+    }
+
     terminal.show_head(&terminal);
 
     // 不能让内核陷入hlt 不然键盘中断就无了
@@ -42,5 +52,5 @@ void panic(const char* msg, int error_no)
         }
     }
     // 陷入死循环 不可操作
-    while(1) {}
+    // while(1) {}
 }

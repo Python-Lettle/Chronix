@@ -100,9 +100,9 @@ _TERMINAL_FUNC_NOARG(Terminal_refresh_cursor)
 {
     uint16_t position = self->row * 80 + self->col; // 假设屏幕宽度为80个字符
     out_byte(0x3D4, 14); // 设置低8位
-    out_byte(0x3D5, position >> 8); // 设置高8位
+    out_byte(0x3D5, (position >> 8) & 0xFF); // 设置高8位
     out_byte(0x3D4, 15);
-    out_byte(0x3D5, position);
+    out_byte(0x3D5, position & 0xFF);
 }
 
 _TERMINAL_FUNC_NOARG(Terminal_backspace)

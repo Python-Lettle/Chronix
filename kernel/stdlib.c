@@ -25,7 +25,7 @@ int atoi(const char *str)
     return result * sign;
 }
 
-char * itoa(int num, char str[], int base)
+char * itoa(int num, char *str, int base)
 {
     if (base == 16) {
         itoa_hex(num, str);
