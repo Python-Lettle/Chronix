@@ -73,10 +73,10 @@ const char numpad_map[] =
          'S', 'T', '@'};
 
 /* 缓冲区相关 */
-uint8_t input_buff[KEYBOARD_IN_BYTES];
-int input_count;
-uint8_t *input_free = input_buff;  /* 指向输入缓冲区的下一个空闲位置 */
-uint8_t *input_todo = input_buff;  /* 指向被处理并返回给终端的位置 */
+// uint8_t input_buff[KEYBOARD_IN_BYTES];
+// int input_count;
+// uint8_t *input_free = input_buff;  /* 指向输入缓冲区的下一个空闲位置 */
+// uint8_t *input_todo = input_buff;  /* 指向被处理并返回给终端的位置 */
 
 
 // 返回一个扫描码对应的ASCII码，忽略修饰符      *
@@ -233,15 +233,15 @@ int keyboard_handler(int irq)
         terminal.in_char(&terminal, ch);
     }
 
-    if(input_count < KEYBOARD_IN_BYTES) {   /* Buffer available. */
-        *input_free++ = scan_code;  /* Scan code append to buffer's free zone. */
-        ++input_count;
+    // if(input_count < KEYBOARD_IN_BYTES) {   /* Buffer available. */
+    //     *input_free++ = scan_code;  /* Scan code append to buffer's free zone. */
+    //     ++input_count;
 
-        /* Buffer is full. */
-        if(input_count == KEYBOARD_IN_BYTES) {
-            input_free = input_buff;
-        }
-    }
+    //     /* Buffer is full. */
+    //     if(input_count == KEYBOARD_IN_BYTES) {
+    //         input_free = input_buff;
+    //     }
+    // }
 
     return ENABLE;
 }

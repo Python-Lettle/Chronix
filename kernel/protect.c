@@ -66,23 +66,24 @@ struct gate_desc_s int_gate_table[] = {
         { INT_VECTOR_IRQ8 + 5, hwint13, KERNEL_PRIVILEGE },
         { INT_VECTOR_IRQ8 + 6, hwint14, KERNEL_PRIVILEGE },
         { INT_VECTOR_IRQ8 + 7, hwint15, KERNEL_PRIVILEGE },
+        /* ************* 软件中断 *************** */
+        { INT_VECTOR_LEVEL0, level0_sys_call, TASK_PRIVILEGE },         /* 提供给系统任务的系统调用：提权 */
  };
 
 
 void protect_init(void)
 {
     /* 将 LOADER 中的 GDT 拷贝到内核中新的 GDT 中 */
-    memcpy(*((uint32_t *) vir2phys(&gdt_ptr[2])), &gdt, *((uint16_t *) vir2phys(&gdt_ptr[0])));
-
+    memcpy(
+        vir2phys(&gdt),                                   // src:LOADER中旧的GDT基地址
+        *((uint32_t *)vir2phys(&gdt_ptr[2])),             // dest:新的GDT基地址
+        *((uint16_t*)vir2phys(&gdt_ptr[0])) + 1           // size:旧GDT的段界限 + 1
+    );
     /* 算出新 GDT 的基地址和界限，设置新的 gdt_ptr */
     uint16_t* p_gdt_limit = (uint16_t*)vir2phys(&gdt_ptr[0]);
     uint32_t* p_gdt_base = (uint32_t*)vir2phys(&gdt_ptr[2]);
     *p_gdt_limit = GDT_SIZE * DESCRIPTOR_SIZE - 1;
     *p_gdt_base = vir2phys(&gdt);
-    init_segment_desc(gdt+1, 0, 0xffffffff, AR_CODE32_ER_K);
-    init_segment_desc(gdt+2, 0, 0xffffffff, AR_DATA32_RW_K);
-    init_segment_desc(gdt+3, 0, 0xffffffff, AR_CODE32_ER_U);
-    init_segment_desc(gdt+4, 0, 0xffffffff, AR_DATA32_RW_U);
 
     /* 算出IDT的基地址和界限，设置新的 idt_ptr */
     uint16_t* p_idt_limit = (uint16_t*)vir2phys(&idt_ptr[0]);
@@ -137,7 +138,7 @@ void init_gate(uint8_t vector,uint8_t desc_type,int_handler_t handler,uint8_t pr
     p_gate->selector = SELECTOR_KERNEL_CS;
     p_gate->dcount = 0;
     p_gate->attr = desc_type | (privilege << 5);
-    p_gate->offset_high = (base_addr >> 16) & 0xFFFF;
+    // p_gate->offset_high = (base_addr >> 16) & 0xFFFF;
 }
 
 /*=========================================================================*

@@ -14,8 +14,6 @@
 
 #include <kernel/type.h>
 
-void keyboard_init(void);
-int keyboard_handler(int irq);
 
 /**
  *	内核遇到了不可恢复的异常或错误，立即准备宕机
@@ -23,6 +21,12 @@ int keyboard_handler(int irq);
 void panic(const char* msg, int error_no);
 void _nop(void);
 void _io_hlt(void);                     /* kernel.asm 中的hlt*/
+
+//============================================================
+// keyboard.c
+//============================================================
+void keyboard_init(void);
+int keyboard_handler(int irq);
 
 //============================================================
 // init.c
@@ -54,9 +58,14 @@ void disable_irq(int int_request);
 
 uint8_t scan_key(void);
 
+void level0(syscall_t func);
+
 /**==================================================
  * kernel.asm
  * ================================================== */
+
+void level0_sys_call(void);
+
 // 所有中断处理入口，一共16个(两个8259A)
 void hwint00 (void);
 void hwint01 (void);

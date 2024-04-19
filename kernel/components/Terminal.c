@@ -90,6 +90,7 @@ _TERMINAL_FUNC_NOARG(Terminal_new_line)
     self->row++;
     self->row = self->row % 25;
     self->col = 0;
+    self->refresh_cursor(self);
 }
 
 //========================================

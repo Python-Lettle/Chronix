@@ -13,6 +13,11 @@
 #include "global.h"
 #include "prototype.h"
 
+void test_int()
+{
+    terminal.print(&terminal, "Test function here!\n");
+}
+
 void chronix_main()
 {
     keyboard_init();
@@ -30,8 +35,7 @@ void chronix_main()
 
     terminal.show_head(&terminal);
 
-    // 不能让内核陷入hlt 不然键盘中断就无了
-    while (1){}
+    level0(_io_hlt);
     
 }
 

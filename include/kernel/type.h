@@ -70,5 +70,7 @@ struct BOOT_PARAM
 typedef void (*int_handler_t)(void);
 /* 中断请求处理函数原型 */
 typedef int (*irq_handler_t)(int irq);
+/* 系统调用函数原型 */
+typedef void (*syscall_t) (void);
 
 #endif

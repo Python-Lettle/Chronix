@@ -26,4 +26,6 @@ void kernel_init(void)
 
     protect_init();     // GDT, IDT, TSS 初始化
     interrupt_init();   // 中断初始化
+
+    level0_func = test_int;
 }

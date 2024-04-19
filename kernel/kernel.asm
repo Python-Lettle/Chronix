@@ -19,11 +19,14 @@ extern exception_handler            ; 异常统一处理例程
 extern gdt_ptr                      ; protect.c / global.h
 extern idt_ptr                      ; protect.c / global.h
 extern irq_handler_table            ; global.h 硬件中断请求处理例程表
+extern level0_func
 
 ; 导出函数
 global _start                       ; 导出_start程序开始符号，链接器需要它
 global _io_hlt
 global _nop                         ; 什么也不做函数
+
+global level0_sys_call
 
 ; 异常处理
 global divide_error
@@ -67,6 +70,11 @@ global	hwint15
 ;   内核堆栈段
 ;----------------------------------------------------------------------------
 StackTop equ 0x7c00
+
+[section .data32]
+bits 32
+    nop
+
 ;============================================================================
 ;   内核代码段
 ;----------------------------------------------------------------------------
@@ -87,6 +95,9 @@ _start:     ; 内核程序入口
     lgdt [gdt_ptr]
 	lidt [idt_ptr]
 
+    jmp SELECTOR_KERNEL_CS:csinit
+
+csinit:
 	; 加载任务状态段 TSS
     xor eax, eax
     mov ax, SELECTOR_TSS
@@ -105,7 +116,11 @@ _io_hlt:
     sti
     hlt
     cli
-    ret
+    jmp _io_hlt
+
+level0_sys_call:
+    call [level0_func]
+    iret
 
 ;============================================================================
 ;   硬件中断处理
@@ -312,3 +327,24 @@ exception:
 .down:
 	hlt                 ; CPU停止运转，宕机
     jmp .down
+
+;============================================================================
+;   保存所有寄存器，即栈帧；然后做一些堆栈切换的工作
+; 执行中断或切换程序时，执行 save 保存 CPU 当前状态，保证之前的程序上下文环境
+;----------------------------------------------------------------------------
+save:
+    ; 将所有的32位通用寄存器压入堆栈
+    pushad
+    ; 然后是特殊段寄存器
+    push ds
+    push es
+    push fs
+    push gs
+    ; 注意：以上的操作都是在操作进程自己的堆栈
+
+    ; ss 是内核数据段，设置 ds 和 es
+    mov dx, ss
+    mov ds, dx
+    mov es, dx
+    mov esi, esp    ; esi 指向进程的栈帧开始处
+    jmp [esi + RETADDR - P_STACKBASE]   ; 回到 call save() 之后继续处理中断

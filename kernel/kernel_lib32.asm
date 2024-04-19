@@ -9,6 +9,10 @@
 ; bilibili: https://space.bilibili.com/420393625
 ;============================================================================
 %include "asm_const.inc"
+
+; 导入变量
+extern level0_func
+
 ; 导出函数
 global in_byte                  ; 从一个端口读取一字节数据
 global out_byte                 ; 向一个端口输出一字节数据
@@ -18,12 +22,12 @@ global interrupt_lock           ; 关闭中断响应，即锁中断
 global interrupt_unlock         ; 打开中断响应，即解锁中断
 global disable_irq              ; 屏蔽一个特定的中断
 global enable_irq               ; 启用一个特定的中断
+global level0                   ; 将一个函数提权到 0，再进行调用
 
 ;============================================================================
 ;   从一个端口读取一字节数据
 ; 函数原型： uint8_t in_byte(port_t port)
 ;----------------------------------------------------------------------------
-align 16
 in_byte:
     push edx
         mov edx, [esp + 4 * 2]      ; 得到端口号
@@ -37,7 +41,6 @@ in_byte:
 ;   向一个端口输出一字节数据
 ; 函数原型： void out_byte(port_t port, uint8_t value)
 ;----------------------------------------------------------------------------
-align 16
 out_byte:
     push edx
         mov edx, [esp + 4 * 2]      ; 得到端口号
@@ -51,7 +54,6 @@ out_byte:
 ;   从一个端口读取一字数据
 ; 函数原型： uint16_t in_word(port_t port)
 ;----------------------------------------------------------------------------
-align 16
 in_word:
     push edx
         mov edx, [esp + 4 * 2]      ; 得到端口号
@@ -64,7 +66,6 @@ in_word:
 ;   向一个端口输出一字数据
 ; 函数原型： void out_word(port_t port, uint16_t value)
 ;----------------------------------------------------------------------------
-align 16
 out_word:
     push edx
         mov edx, [esp + 4 * 2]      ; 得到端口号
@@ -77,7 +78,6 @@ out_word:
 ;   关闭中断响应，也称为锁中断
 ; 函数原型： void interrupt_lock(void)
 ;----------------------------------------------------------------------------
-align 16
 interrupt_lock:
         cli
     ret
@@ -85,7 +85,6 @@ interrupt_lock:
 ;   打开中断响应，也称为解锁中断
 ; 函数原型： void interrupt_unlock(void)
 ;----------------------------------------------------------------------------
-align 16
 interrupt_unlock:
         sti
     ret
@@ -93,7 +92,6 @@ interrupt_unlock:
 ;   屏蔽一个特定的中断
 ; 函数原型： int disable_irq(int int_request);
 ;----------------------------------------------------------------------------
-align 16
 disable_irq:
     pushf                   ; 将标志寄存器 EFLAGS 压入堆栈，需要用到test指令，会改变 EFLAGS
     push ecx
@@ -134,7 +132,6 @@ disable_already:
 ;   启用一个特定的中断
 ; 函数原型： void enable_irq(int int_request);
 ;----------------------------------------------------------------------------
-align 16
 enable_irq:
     pushf                   ; 将标志寄存器 EFLAGS 压入堆栈，需要用到test指令，会改变 EFLAGS
     push ecx
@@ -158,3 +155,13 @@ enable_ok:
       pop ecx
       popf
       ret
+
+;============================================================================
+;   将一个函数提权到 0，再进行调用
+; 函数原型： void level0(flyanx_syscall_t func);
+;----------------------------------------------------------------------------
+level0:
+    mov eax, [esp + 4]
+    mov [level0_func], eax  ; 将提权函数指针放到 level0_func 中
+    int LEVEL0_VECTOR	    ; 好的，调用提权调用去执行提权成功的例程
+    ret
