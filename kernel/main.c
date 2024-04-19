@@ -26,9 +26,9 @@ void chronix_main()
     // Print memory size
     uint32_t memsize = boot_param->memsize / 1024 /1024;       // MB
     if (memsize != 0) {
-        terminal.print(&terminal, "OS memory size(MB): ");
+        terminal.print(&terminal, "OS memory size: ");
         terminal.print_int(&terminal, memsize, 10);
-        terminal.print(&terminal, "\n");
+        terminal.print(&terminal, " MB\n");
     } else {
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
@@ -56,5 +56,6 @@ void panic(const char* msg, int error_no)
         }
     }
     // 陷入死循环 不可操作
-    // while(1) {}
+    interrupt_lock();
+    level0(_io_hlt);
 }

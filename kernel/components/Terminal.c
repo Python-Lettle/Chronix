@@ -127,7 +127,7 @@ _TERMINAL_FUNC_NOARG(Terminal_backspace)
 
 _TERMINAL_FUNC_NOARG(Terminal_show_head)
 {
-    self->print(self, "root@Chronix$ ");
+    self->print(self, "Chronix> ");
 }
 
 _TERMINAL_FUNC_NOARG(Terminal_command_exec)
