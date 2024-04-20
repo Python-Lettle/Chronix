@@ -58,6 +58,37 @@ typedef struct seg_descriptor_s
     uint8_t base_high;         /* 段基址高8位 */
 } SegDescriptor;
 
+// 假设PDE和PTE都是32位的，并包含一些常见的标志位
+typedef struct
+{
+    uint32_t present       : 1;   // 页面是否存在于物理内存中
+    uint32_t rw            : 1;   // 读/写权限
+    uint32_t user          : 1;   // 用户/内核模式权限
+    uint32_t pwt           : 1;   // Page Write-Through
+    uint32_t pcd           : 1;   // Page Cache Disable
+    uint32_t accessed      : 1;   // 页面是否被访问过
+    uint32_t dirty         : 1;   // 页面是否被修改过
+    uint32_t pat           : 1;   // Page Attribute Table
+    uint32_t global        : 1;   // 全局页
+    uint32_t available     : 3;   // 可用字段，供系统使用
+    uint32_t frame         : 20;  // 物理页帧号
+} pde_t;
+
+typedef struct
+{
+    uint32_t present       : 1;   // 页面是否存在于物理内存中
+    uint32_t rw            : 1;   // 读/写权限
+    uint32_t user          : 1;   // 用户/内核模式权限
+    uint32_t pwt           : 1;   // Page Write-Through
+    uint32_t pcd           : 1;   // Page Cache Disable
+    uint32_t accessed      : 1;   // 页面是否被访问过
+    uint32_t dirty         : 1;   // 页面是否被修改过
+    uint32_t pat           : 1;   // Page Attribute Table
+    uint32_t global        : 1;   // 全局页
+    uint32_t available     : 3;   // 可用字段，供系统使用
+    uint32_t frame         : 20;  // 物理页帧号
+} pte_t;
+
 /**
  * @brief Loader已经将启动参数放置在0x500中，这个结构体用来获取。
  */

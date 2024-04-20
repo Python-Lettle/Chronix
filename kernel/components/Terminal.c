@@ -9,9 +9,47 @@
  * bilibili: https://space.bilibili.com/420393625
  */
 #include "Terminal.h"
+#include "../global.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// 解析命令
+int command_exec(Terminal *self, const char* input_str)
+{
+    // 获取第一个空格以前的内容，就是指令名称
+    char command[MAX_CMD_LEN];
+    int command_index = 0;
+    char *p = input_str;
+    while((*p!='\0') && (*p!=' ')) {
+        command[command_index++] = *p;
+        p++;
+    }
+    command[command_index] = '\0';
+    if (!strcmp(command, "ls")) {
+        self->print(self, ". ..");
+    } else if (!strcmp(command, "addr")) {
+        char arg1[MAX_CMD_LEN];
+        int arg1_index = 0;
+        p++;
+        while((*p!='\0') && (*p != ' ')) {
+            arg1[arg1_index++] = *p;
+            p++;
+        }
+        arg1[arg1_index] = '\0';
+
+        self->print(self, "parsing ");
+        int address = atoi(arg1);
+        self->print_int(self, address, 16);
+        self->print(self, " to physical address...\n");
+        
+        terminal.print_int(&terminal, memman.parse_phys_addr(&memman, address),16);
+    } else {
+        self->print(self, "command not found: ");
+        self->print(self, command);
+    }
+}
+
 
 //========================================
 // 输入函数
@@ -90,7 +128,6 @@ _TERMINAL_FUNC_NOARG(Terminal_new_line)
     self->row++;
     self->row = self->row % 25;
     self->col = 0;
-    self->refresh_cursor(self);
 }
 
 //========================================
@@ -139,13 +176,7 @@ _TERMINAL_FUNC_NOARG(Terminal_command_exec)
     self->input_command[++self->input_command_index] = '\0';
 
     // 解析命令
-    char * command = self->input_command;
-    if (!strcmp(command, "ls")) {
-        self->print(self, ". ..");
-    } else {
-        self->print(self, "command not found: ");
-        self->print(self, command);
-    }
+    command_exec(self, self->input_command);
     
     // 清空命令
     self->input_command[0] = '\0';

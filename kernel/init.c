@@ -11,11 +11,13 @@
 #include "prototype.h"
 #include "global.h"
 #include "components/Terminal.h"
+#include "components/MemMan.h"
 #include <type.h>
 
 // 定义全局变量
 struct BOOT_PARAM *boot_param;
 Terminal terminal;
+MemMan memman;
 
 void kernel_init(void)
 {
@@ -27,5 +29,5 @@ void kernel_init(void)
     protect_init();     // GDT, IDT, TSS 初始化
     interrupt_init();   // 中断初始化
 
-    level0_func = test_int;
+    MemMan_init(&memman, boot_param->memsize);
 }

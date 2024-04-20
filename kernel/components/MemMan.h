@@ -12,14 +12,20 @@
 #ifndef CHRONIX_MEMMAN_H
 #define CHRONIX_MEMMAN_H
 
-#include <type.h>
-#include <config.h>
+#include <kernel/type.h>
+#include <kernel/config.h>
 
 /**
  * 需要管理的页数量:
  * 
  */
-#define PAGE_NUM 
+#define PDE_COUNT 1024 // 页目录项的数量
+#define PTE_COUNT_PER_TABLE 1024 // 每个页表的页表项数量
+
+// 页目录开始地址:		1M
+#define PAGE_DIR_BASE 0x100000
+// 页表开始地址:		1M + 4K
+#define PAGE_TABLE_BASE	0x101000
 
 typedef struct MemMan MemMan;
 struct MemMan
@@ -27,12 +33,15 @@ struct MemMan
     //====================
     // 属性区
     //====================
-    uint8_t *page_using;        //指针，将会指向 0x100000 ~ 0x1FFFFF 的页表 (256 * 4096)
+    uint32_t memsize;
+
+    pde_t* pde_base;
+    pte_t* pte_tables_base;
 
     //====================
     // 函数区
     //====================
-
+    uint32_t (*parse_phys_addr) (MemMan *self, uint32_t virtual_address);
 };
 
 /**

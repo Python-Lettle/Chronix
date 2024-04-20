@@ -20,6 +20,7 @@
 
 // 终端缓冲区大小
 #define TERMINAL_INPUT_BUFFER_SIZE 32
+#define MAX_CMD_LEN 64      // 指令名最长大小
 
 /**
  * @brief 帮助操作系统管理终端输出位置、输出颜色

@@ -28,7 +28,8 @@ void chronix_main()
     if (memsize != 0) {
         terminal.print(&terminal, "OS memory size: ");
         terminal.print_int(&terminal, memsize, 10);
-        terminal.print(&terminal, " MB\n");
+        terminal.print(&terminal, " MB");
+        terminal.new_line(&terminal);
     } else {
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
@@ -56,6 +57,9 @@ void panic(const char* msg, int error_no)
         }
     }
     // 陷入死循环 不可操作
-    interrupt_lock();
-    level0(_io_hlt);
+    while (1)
+    {
+        /* code */
+    }
+    
 }
