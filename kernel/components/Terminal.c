@@ -44,6 +44,8 @@ int command_exec(Terminal *self, const char* input_str)
         self->print(self, " to physical address...\n");
         
         terminal.print_int(&terminal, memman.parse_phys_addr(&memman, address),16);
+    } else if (!strcmp(command, "clear")) {
+        self->clear(self);
     } else {
         self->print(self, "command not found: ");
         self->print(self, command);
@@ -120,13 +122,46 @@ _TERMINAL_FUNC(Terminal_print_int, int num, int base)
     self->print(self, num_str);
 }
 
+// 清屏函数
+_TERMINAL_FUNC_NOARG(Terminal_clear)
+{
+    // 输出满屏空白
+    uint16_t* vga_p = (uint16_t *)0xb8000;
+    for(int i=0; i<2000; i++) {
+        *vga_p = (' ' & 0xff) | (0x07 << 8);
+        vga_p++;
+    }
+
+    // 重置行列和光标
+    self->row = -1;
+    self->col = 0;
+    self->refresh_cursor(self);
+}
+
+// 滚屏函数
+_TERMINAL_FUNC(Terminal_scrollup, int line)
+{
+    memcpy(0xb8000, 0xb80A0, 3840); // 从第二行到最后一行整体向上复制一行
+    // 清空最后一行
+    for (int i=0; i<80; i++) {
+        memset(0xb8f00+i*2, (' ' & 0xff), 1);
+        memset(0xb8f00+i*2+1, (0x07 << 8), 1);
+    }
+    self->col = 0;
+    self->refresh_cursor(self);
+}
 /**
  * @brief 换行
  */
 _TERMINAL_FUNC_NOARG(Terminal_new_line)
 {
-    self->row++;
-    self->row = self->row % 25;
+    if (self->row < 24) {
+        self->row++;
+    } else {
+        // 触发滚屏
+        self->scrollup(self);
+    }
+    
     self->col = 0;
 }
 
@@ -194,6 +229,8 @@ void Terminal_init(Terminal *terminal, int row, int col)
     // terminal->deletable = 0;
     terminal->print = Terminal_print;
     terminal->print_int = Terminal_print_int;
+    terminal->scrollup = Terminal_scrollup;
+    terminal->clear = Terminal_clear;
     terminal->new_line = Terminal_new_line;
     terminal->in_char = Terminal_input;
     terminal->print_buffer = Terminal_print_buffer;

@@ -37,9 +37,15 @@ uint32_t parse_phys_addr(MemMan *self, uint32_t virtual_address)
     terminal.print(&terminal, "pde_index=");
     terminal.print_int(&terminal, pde_index, 10);
     terminal.new_line(&terminal);
+
+    terminal.print(&terminal, "pte_avail=");
+    terminal.print_int(&terminal, pte->available, 10);
+    terminal.new_line(&terminal);
     terminal.print(&terminal, "pte_index=");
     terminal.print_int(&terminal, pte_index, 10);
     terminal.new_line(&terminal);
+
+
     terminal.print(&terminal, "offset(16)=");
     terminal.print_int(&terminal, offset, 16);
     terminal.new_line(&terminal);

@@ -26,7 +26,7 @@ void chronix_main()
     // Print memory size
     uint32_t memsize = boot_param->memsize / 1024 /1024;       // MB
     if (memsize != 0) {
-        terminal.print(&terminal, "OS memory size: ");
+        terminal.print(&terminal, "Memory size: ");
         terminal.print_int(&terminal, memsize, 10);
         terminal.print(&terminal, " MB");
         terminal.new_line(&terminal);

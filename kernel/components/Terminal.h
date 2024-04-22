@@ -73,7 +73,9 @@ struct Terminal
     /**
      * @brief 终端换行
      */
+    void (*scrollup)(Terminal *self);
     void (*new_line)(Terminal *self);
+    void (*clear)(Terminal *self);
 
     /**
      * @brief 将缓冲区未输出到屏幕的内容全部输出，顺便清空缓冲区
