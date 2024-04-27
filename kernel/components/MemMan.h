@@ -14,13 +14,16 @@
 
 #include <kernel/type.h>
 #include <kernel/config.h>
+#include <util/bitmap.h>
 
 /**
  * 需要管理的页数量:
  * 
  */
-#define PDE_COUNT 1024 // 页目录项的数量
-#define PTE_COUNT_PER_TABLE 1024 // 每个页表的页表项数量
+#define PDE_COUNT 1024              // 页目录项的数量
+#define PTE_COUNT_PER_TABLE 1024    // 每个页表的页表项数量
+#define MEM_PAGE_SIZE 4             // 内存页大小 4KB
+#define KERNEL_PAGE 512             // 初始2M设置不可使用, 即512个页
 
 // 页目录开始地址:		1M
 #define PAGE_DIR_BASE 0x100000
@@ -37,6 +40,8 @@ struct MemMan
 
     pde_t* pde_base;
     pte_t* pte_tables_base;
+
+    bitmap_t* mem_bitmap;       // 内存位图
 
     //====================
     // 函数区

@@ -104,7 +104,7 @@ csinit:
     ltr ax
 
     ; 跳入C语言编写的主函数
-    call chronix_main
+    jmp chronix_main
 
     jmp $
 

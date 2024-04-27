@@ -25,7 +25,7 @@ void kernel_init(void)
     boot_param = (struct BOOT_PARAM *)BOOT_PARAM_ADDR;
     // 初始化 Terminal
     Terminal_init(&terminal, 5, 0);
-
+    
     protect_init();     // GDT, IDT, TSS 初始化
     interrupt_init();   // 中断初始化
 

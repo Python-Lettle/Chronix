@@ -24,7 +24,7 @@ void chronix_main()
     interrupt_unlock();     // 放在别的地方就无了
 
     // Print memory size
-    uint32_t memsize = boot_param->memsize / 1024 /1024;       // MB
+    uint32_t memsize = boot_param->memsize / 1024 / 1024;       // MB
     if (memsize != 0) {
         terminal.print(&terminal, "Memory size: ");
         terminal.print_int(&terminal, memsize, 10);
@@ -37,7 +37,6 @@ void chronix_main()
     terminal.show_head(&terminal);
 
     level0(_io_hlt);
-    
 }
 
 /**

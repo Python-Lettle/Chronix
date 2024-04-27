@@ -43,7 +43,7 @@ int command_exec(Terminal *self, const char* input_str)
         self->print_int(self, address, 16);
         self->print(self, " to physical address...\n");
         
-        terminal.print_int(&terminal, memman.parse_phys_addr(&memman, address),16);
+        memman.parse_phys_addr(&memman, address);
     } else if (!strcmp(command, "clear")) {
         self->clear(self);
     } else {

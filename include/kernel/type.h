@@ -68,9 +68,11 @@ typedef struct
     uint32_t pcd           : 1;   // Page Cache Disable
     uint32_t accessed      : 1;   // 页面是否被访问过
     uint32_t dirty         : 1;   // 页面是否被修改过
+
     uint32_t pat           : 1;   // Page Attribute Table
     uint32_t global        : 1;   // 全局页
     uint32_t available     : 3;   // 可用字段，供系统使用
+
     uint32_t frame         : 20;  // 物理页帧号
 } pde_t;
 
@@ -83,9 +85,11 @@ typedef struct
     uint32_t pcd           : 1;   // Page Cache Disable
     uint32_t accessed      : 1;   // 页面是否被访问过
     uint32_t dirty         : 1;   // 页面是否被修改过
+
     uint32_t pat           : 1;   // Page Attribute Table
     uint32_t global        : 1;   // 全局页
     uint32_t available     : 3;   // 可用字段，供系统使用
+    
     uint32_t frame         : 20;  // 物理页帧号
 } pte_t;
 

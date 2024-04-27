@@ -15,6 +15,9 @@
 #define BOOT_PARAM_ADDR 0x500       // boot参数地址
 #define FREE_MEM_ADDR 0x100000      // 可用内存起始点
 
+#define MAX_MEM_SIZE_MB 4096        // 操作系统内核支持的最大内存(MB)
+#define MAX_MEM_SIZE_KB 4194304     // 操作系统内核支持的最大内存(KB)
+
 /* 内核代码段、数据段基地址
  * 注意：要和GDT中设置的值保持一致！
  */
