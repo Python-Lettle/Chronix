@@ -42,6 +42,8 @@ typedef struct bit_map {
  */
 void bitmap_init(bitmap_t* self, uint32_t* array, int total_bits);
 
+bool bitmap_get_bit(bitmap_t* self, int index);
+
 /**
  * @brief 设置 index 位为 value
  * @param index int类型 该位在位图的哪一个位置

@@ -15,16 +15,17 @@
  * @brief 将字符串转换成int型数字
  * 
  * @param str 要转换成数字的字符串
+ * @param base：转换后的进制数，可以是10进制、16进制等，范围必须在 2-36
  * @return int 转换后的数字
  */
-int atoi(const char *str);
+int atoi(const char *str, int base);
 
 /**
  * @brief 将int型数字转换成字符串
  * 
- * @param value：要转换的数据
- * @param string：目标字符串的地址
- * @param radix：转换后的进制数，可以是10进制、16进制等，范围必须在 2-36
+ * @param num：要转换的数据
+ * @param str：目标字符串的地址
+ * @param base：转换后的进制数，可以是10进制、16进制等，范围必须在 2-36
  */
 char * itoa(int num, char str[], int base);
 

@@ -94,6 +94,20 @@ typedef struct
 } pte_t;
 
 /**
+ * @brief 内存管理使用的结构体
+ * vir_address  内存虚拟地址
+ * bitmap_index 位图起始索引
+ * page_num     占用n个页
+ */
+typedef struct
+{
+    uint32_t vir_address;   // 分配的虚拟地址
+    uint32_t bitmap_index;  // 0~1048575
+    uint32_t page_num;      // 占用了多少页
+} MemInfo;
+
+
+/**
  * @brief Loader已经将启动参数放置在0x500中，这个结构体用来获取。
  */
 struct BOOT_PARAM

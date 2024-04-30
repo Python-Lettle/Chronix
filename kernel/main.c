@@ -34,6 +34,11 @@ void chronix_main()
         terminal.print(&terminal, "Can not calculate memory size.\n");
     }
 
+    int * num_ptr = memman.malloc_phy(&memman, sizeof(int));
+    terminal.print_int(&terminal, num_ptr, 16);
+    terminal.new_line(&terminal);
+    *num_ptr = 26214;
+
     terminal.show_head(&terminal);
 
     level0(_io_hlt);

@@ -26,9 +26,15 @@ int command_exec(Terminal *self, const char* input_str)
         p++;
     }
     command[command_index] = '\0';
+
+    //==============================
+    // 解析各种命令
+    //==============================
     if (!strcmp(command, "ls")) {
         self->print(self, ". ..");
+
     } else if (!strcmp(command, "addr")) {
+        // 获取第一个参数
         char arg1[MAX_CMD_LEN];
         int arg1_index = 0;
         p++;
@@ -39,17 +45,71 @@ int command_exec(Terminal *self, const char* input_str)
         arg1[arg1_index] = '\0';
 
         self->print(self, "parsing ");
-        int address = atoi(arg1);
+        int address = atoi(arg1, 10);
         self->print_int(self, address, 16);
         self->print(self, " to physical address...\n");
         
         memman.parse_phys_addr(&memman, address);
+
     } else if (!strcmp(command, "clear")) {
         self->clear(self);
+
+    } else if (!strcmp(command, "bitmap")) {
+        // 获取第一个参数
+        char arg1[MAX_CMD_LEN];
+        int arg1_index = 0;
+        p++;
+        while((*p!='\0') && (*p != ' ')) {
+            arg1[arg1_index++] = *p;
+            p++;
+        }
+        arg1[arg1_index] = '\0';
+        // 判断第一个参数
+        if (!(strcmp(arg1, "first"))) {
+            terminal.print(&terminal, "First empty memory page bitmap index: ");
+            terminal.print_int(&terminal, bitmap_first_0(memman.mem_bitmap), 10);
+        } else {
+            memman.bitmap_show(&memman, atoi(arg1, 10));
+        }
+    
+    } else if (!strcmp(command, "meminfo")) {
+        // 获取第一个参数
+        char arg1[MAX_CMD_LEN];
+        int arg1_index = 0;
+        p++;
+        while((*p!='\0') && (*p != ' ')) {
+            arg1[arg1_index++] = *p;
+            p++;
+        }
+        arg1[arg1_index] = '\0';
+        
+        memman.meminfo_show(&memman, atoi(arg1, 10));
+
+    } else if (!strcmp(command, "createmem")) {
+        terminal.print(&terminal, "Memory address: ");
+        terminal.print_int(&terminal, memman.malloc_phy(&memman, 10), 16);
+
+    } else if (!strcmp(command, "freemem")) {
+        // 获取第一个参数
+        char arg1[MAX_CMD_LEN];
+        int arg1_index = 0;
+        p++;
+        while((*p!='\0') && (*p != ' ')) {
+            arg1[arg1_index++] = *p;
+            p++;
+        }
+        arg1[arg1_index] = '\0';
+
+        if (memman.free_phy(&memman, atoi(arg1, 16))) {
+            terminal.print(&terminal, "Memory free done!");
+        }
+
     } else {
         self->print(self, "command not found: ");
         self->print(self, command);
     }
+
+
 }
 
 
@@ -117,7 +177,7 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
 
 _TERMINAL_FUNC(Terminal_print_int, int num, int base)
 {
-    char num_str[16] = {0};
+    char num_str[20] = {0};
     itoa(num, num_str, base);
     self->print(self, num_str);
 }

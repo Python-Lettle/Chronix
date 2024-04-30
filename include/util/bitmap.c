@@ -11,26 +11,30 @@
 
 #include "bitmap.h"
 
-
 void bitmap_init(bitmap_t* self, uint32_t* array, int total_bits)
 {
     self->total_bits = total_bits;
-    self->array_size = total_bits / 32 + 1;     // 预留一个防止有余数
+    self->array_size = total_bits / 32;
     self->array = array;
+}
+
+bool bitmap_get_bit(bitmap_t* self, int index)
+{
+    return GET_BIT(self->array[index / 32], index % 32);
 }
 
 void bitmap_set_bit_0(bitmap_t* self, int index)
 {
     int array_index = index / 32;
     int bit_offset = index % 32;
-    self->array[array_index] = self->array[array_index] | (0 << bit_offset);
+    CLEAR_BIT(self->array[array_index], bit_offset);
 }
 
 void bitmap_set_bit_1(bitmap_t* self, int index)
 {
     int array_index = index / 32;
     int bit_offset = index % 32;
-    self->array[array_index] = self->array[array_index] | (1 << bit_offset);
+    self->array[array_index] |= (1 << bit_offset);
 }
 
 int bitmap_first_0 (bitmap_t* self)

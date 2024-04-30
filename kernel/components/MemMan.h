@@ -23,7 +23,9 @@
 #define PDE_COUNT 1024              // 页目录项的数量
 #define PTE_COUNT_PER_TABLE 1024    // 每个页表的页表项数量
 #define MEM_PAGE_SIZE 4             // 内存页大小 4KB
-#define KERNEL_PAGE 512             // 初始2M设置不可使用, 即512个页
+#define KERNEL_PAGE 1281            // 初始5M+4K设置不可使用, 即 (5M+4K) / 4K = 1281 个页
+
+#define MEM_INFO_MAX 1024
 
 // 页目录开始地址:		1M
 #define PAGE_DIR_BASE 0x100000
@@ -39,14 +41,24 @@ struct MemMan
     uint32_t memsize;
 
     pde_t* pde_base;
-    pte_t* pte_tables_base;
 
     bitmap_t* mem_bitmap;       // 内存位图
+
+    MemInfo* mem_info;     // 最多保存 MEM_INFO_MAX 条虚拟地址的开启
 
     //====================
     // 函数区
     //====================
     uint32_t (*parse_phys_addr) (MemMan *self, uint32_t virtual_address);
+    uint32_t (*parse_vir_addr) (MemMan *self, int pde_index, int pte_index, int offset);
+
+    void* (*malloc) (MemMan *self, int size);
+    void* (*malloc_phy) (MemMan *self, int size);
+    bool  (*free) (MemMan *self, uint32_t vir_address);
+    bool  (*free_phy) (MemMan *self, uint32_t address);
+
+    bool (*bitmap_show) (MemMan *self, int index);
+    void (*meminfo_show) (MemMan *self, int index);
 };
 
 /**

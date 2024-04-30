@@ -25,6 +25,9 @@ typedef char bool;
 #define TRUE 1
 #define FALSE 0
 
+#define	GET_BIT(x, bit)	((x & (1 << bit)) >> bit)	/* 获取第bit位 */
+#define	CLEAR_BIT(x, bit)	(x &= ~(1 << bit))	/* 清零第bit位 */
+
 /**
  * @brief 判断一个char是否表示一个数字
  * 
