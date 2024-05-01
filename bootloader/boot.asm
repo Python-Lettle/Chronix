@@ -163,8 +163,8 @@ DISK_BUFFER equ 0x1e00 ;读磁盘用的缓存区，放到kernel之前的512字�
 
 loader_file_name_string:db "LOADER  BIN",0          ; 文件名 11字节
 ; boot_start_string:db "Chronix boot start.",0
-loader_not_found_string:db "Loader not found.",0
-loader_found_string:db "Loader found, jumping...",0
+loader_not_found_string:db "[Boot   Info] Loader not found.",0
+loader_found_string:db "[Boot   Info] Loader found, jumping...",0
 
 times 510-($-$$) db 0
 db 0x55,0xaa

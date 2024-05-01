@@ -65,6 +65,8 @@ struct Terminal
      */
     void (*print_int)(Terminal *self, int num, int base);
 
+    void (*print_info)(Terminal *self, const char *str);
+
     /**
      * @brief 退格，即删除上一个
      */

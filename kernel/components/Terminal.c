@@ -177,9 +177,15 @@ _TERMINAL_FUNC(Terminal_print, const char *str)
 
 _TERMINAL_FUNC(Terminal_print_int, int num, int base)
 {
-    char num_str[20] = {0};
+    char num_str[40] = {0};
     itoa(num, num_str, base);
     self->print(self, num_str);
+}
+
+_TERMINAL_FUNC(Terminal_print_info, const char *str)
+{
+    self->print(self, "[Kernel Info] ");
+    self->print(self, str);
 }
 
 // 清屏函数
@@ -289,6 +295,7 @@ void Terminal_init(Terminal *terminal, int row, int col)
     // terminal->deletable = 0;
     terminal->print = Terminal_print;
     terminal->print_int = Terminal_print_int;
+    terminal->print_info = Terminal_print_info;
     terminal->scrollup = Terminal_scrollup;
     terminal->clear = Terminal_clear;
     terminal->new_line = Terminal_new_line;

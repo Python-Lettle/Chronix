@@ -14,7 +14,7 @@
 void bitmap_init(bitmap_t* self, uint32_t* array, int total_bits)
 {
     self->total_bits = total_bits;
-    self->array_size = total_bits / 32;
+    self->array_size = total_bits / 32 + 1;     // 预留一个防止有余数
     self->array = array;
 }
 

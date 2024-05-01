@@ -26,18 +26,13 @@ void chronix_main()
     // Print memory size
     uint32_t memsize = boot_param->memsize / 1024 / 1024;       // MB
     if (memsize != 0) {
-        terminal.print(&terminal, "Memory size: ");
+        terminal.print_info(&terminal, "Memory size: ");
         terminal.print_int(&terminal, memsize, 10);
         terminal.print(&terminal, " MB");
         terminal.new_line(&terminal);
     } else {
-        terminal.print(&terminal, "Can not calculate memory size.\n");
+        terminal.print_info(&terminal, "Can not calculate memory size.\n");
     }
-
-    int * num_ptr = memman.malloc_phy(&memman, sizeof(int));
-    terminal.print_int(&terminal, num_ptr, 16);
-    terminal.new_line(&terminal);
-    *num_ptr = 26214;
 
     terminal.show_head(&terminal);
 

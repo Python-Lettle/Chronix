@@ -28,6 +28,9 @@
 
 #include <type.h>
 
+#define	GET_BIT(x, bit)	((x & (1 << bit)) >> bit)	/* 获取第bit位 */
+#define	CLEAR_BIT(x, bit)	(x = x & (~(1 << bit)))	/* 清零第bit位 */
+
 /**
  * @brief bitmap 结构体，包含array数组大小和一共可以管理多少个bit
  */
